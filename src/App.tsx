@@ -125,6 +125,16 @@ function App() {
 
   return (
     <>
+      <div style={{ display: "flex", alignItems: "baseline" }}>
+        <h2>Fluree Editor </h2>&nbsp;
+        <a
+          href="https://github.com/johncrowley-s2/fluree-editor"
+          target="_blank"
+        >
+          {" "}
+          View code on Github
+        </a>
+      </div>
       <div
         style={{
           width: "100%",

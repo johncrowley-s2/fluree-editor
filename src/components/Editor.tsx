@@ -1,4 +1,4 @@
-// The editor uses a textare element with text color set to transparent
+// The editor uses a textarea element with text color set to transparent
 // overlaid over a pre element which shows the actual text with syntax highlighting.
 // See the render() func that gets passed in as a prop here to see how that happens.
 

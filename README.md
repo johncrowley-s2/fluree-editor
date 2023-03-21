@@ -13,4 +13,4 @@ Most of the magic happens in the props that get passed in to the editor. The `va
 
 The "lib" folder contains a basic JSON lexer which splits the input string into an array of tokens. Currently this code only performs lexical analysis and emits errors for invalid tokens, but semantic analysis is coming soon!
 
-Currently there is an effect in `App.tsx` which handles showing a "tooltip" (once again a better name is needed) when you hover over a JSON-LD reserved keyword. This was put there for demo purposes; I plan to make a better system for displaying tooltips, hints, auto-complete suggestions, and other intellisense.
+At the moment, there is an effect in `App.tsx` which handles showing a "tooltip" (once again a better name is needed) when you hover over a JSON-LD reserved keyword. This was put there for demo purposes; I plan to make a better system for displaying tooltips, hints, auto-complete suggestions, and other intellisense.

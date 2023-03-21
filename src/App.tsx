@@ -131,7 +131,6 @@ function App() {
           href="https://github.com/johncrowley-s2/fluree-editor"
           target="_blank"
         >
-          {" "}
           View code on Github
         </a>
       </div>

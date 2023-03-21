@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import Editor from "./components/Editor";
-import { initValue } from "./initValue";
+import { initValue } from "./lib/initValue";
 import {
   JldKeyword,
   JSON_LD_KEYWORDS,
   JSON_LD_KEYWORD_DESCRIPTIONS,
-} from "./jsonLd";
-import tokenize, { Token } from "./lexer";
+} from "./lib/jsonLd";
+import tokenize, { Token } from "./lib/lexer";
 import {
   altDarkTheme,
   altLightTheme,

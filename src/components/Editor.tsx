@@ -2,6 +2,9 @@
 // overlaid over a pre element which shows the actual text with syntax highlighting.
 // See the render() func that gets passed in as a prop here to see how that happens.
 
+import { useEffect, useRef, useState } from "react";
+import { debounce } from "../lib/debounce";
+import getCaretCoordinates, { Coordinates } from "../lib/getCaretCoordinates";
 import { Theme } from "../themes";
 
 interface Props {
@@ -25,6 +28,33 @@ export default function Editor({
   numLines,
   readonly = false,
 }: Props) {
+  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [caretCoordinates, setCaretCoordinates] = useState<Coordinates>({
+    top: 0,
+    left: 0,
+  });
+
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (editorRef.current) {
+      const coordinates = getCaretCoordinates(
+        editorRef.current,
+        editorRef.current.selectionStart
+      );
+      setCaretCoordinates({
+        top: coordinates.top + 8,
+        left: coordinates.left,
+      });
+      flashAutocomplete();
+    }
+  }, [value]);
+
+  const flashAutocomplete = debounce(() => {
+    setShowAutocomplete(true);
+    setTimeout(() => setShowAutocomplete(false), 3000);
+  }, 200);
+
   return (
     <div
       style={{
@@ -73,6 +103,7 @@ export default function Editor({
         />
         {!readonly && (
           <textarea
+            ref={editorRef}
             rows={rows}
             cols={100}
             wrap="off"
@@ -87,6 +118,25 @@ export default function Editor({
             spellCheck="false"
           />
         )}
+        {showAutocomplete ? (
+          <div
+            id="autocomplete"
+            style={{
+              maxWidth: "16rem",
+              position: "absolute",
+              top: caretCoordinates.top,
+              left: caretCoordinates.left,
+              padding: "1rem",
+              backgroundColor: theme.backgroundColor,
+              color: theme.defaultTextColor,
+              border: `1px solid ${theme.defaultTextColor}`,
+              fontSize: 14,
+              fontFamily: "sans-serif",
+            }}
+          >
+            TODO: AUTOCOMPLETE GOES HERE
+          </div>
+        ) : null}
       </div>
     </div>
   );

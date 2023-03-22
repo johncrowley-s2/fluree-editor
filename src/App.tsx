@@ -1,5 +1,7 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Editor from "./components/Editor";
+import { debounce } from "./lib/debounce";
+import getCaretCoordinates, { Coordinates } from "./lib/getCaretCoordinates";
 import { initValue } from "./lib/initValue";
 import {
   JldKeyword,
@@ -22,6 +24,7 @@ function App() {
   const [numLines, setNumLines] = useState(0);
   const [theme, setTheme] = useState<Theme>(lightTheme);
   const [showLineNumbers, setShowLineNumbers] = useState(true);
+  const [showTokens, setShowTokens] = useState(false);
   const [highlight, setHighlight] = useState(true);
   const [readonly, setReadonly] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -39,19 +42,6 @@ function App() {
   useEffect(() => {
     // Effect for showing the "tooltip" thing (need a better term but yea...)
     // Doing some hacky shit here to find the overlapping span element behind the text area.
-
-    // Debounce function to delay handleMouseMove calls
-    const debounce = (func: any, delay: number) => {
-      let timeoutId: any;
-      return function (...args: any[]) {
-        if (timeoutId) {
-          clearTimeout(timeoutId);
-        }
-        timeoutId = setTimeout(() => {
-          func.apply(null, args);
-        }, delay);
-      };
-    };
 
     // Debounced handleMouseMove function with a 200ms delay
     const handleMouseMoveDebounced = debounce(handleMouseMove, 200);
@@ -204,32 +194,48 @@ function App() {
         </ul>
         <hr />
         <div style={{ width: "100%", height: "100%" }}>
-          <h3>Tokens ({tokens.length}):</h3>
+          <div style={{ display: "flex" }}>
+            <button
+              style={{ alignSelf: "center", marginRight: "1rem" }}
+              onClick={() => setShowTokens(!showTokens)}
+            >
+              {showTokens ? "Close" : "Open"}
+            </button>
+            <h3>Inspect Tokens ({tokens.length}):</h3>
+          </div>
           <div>
-            <table>
-              <thead>
-                <tr>
-                  <th>Index</th>
-                  <th>Type</th>
-                  <th>Value</th>
-                </tr>
-              </thead>
-              <tbody>
-                {tokens.map((t, i) => (
-                  <tr key={t.type + i}>
-                    <td>{i}</td>
-                    <td>
-                      <pre style={{ color: theme.tokenColors[t.type] }}>
-                        {t.type}
-                      </pre>
-                    </td>
-                    <td>
-                      <pre>{t.value}</pre>
-                    </td>
+            {showTokens ? (
+              <table>
+                <thead>
+                  <tr>
+                    <th>Index</th>
+                    <th>Type</th>
+                    <th>Line</th>
+                    <th>Position</th>
+                    <th>Value</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {tokens.map((t, i) => (
+                    <tr key={t.type + i}>
+                      <td>{i}</td>
+                      <td>
+                        <pre style={{ color: theme.tokenColors[t.type] }}>
+                          {t.type}
+                        </pre>
+                      </td>
+                      <td>{t.line}</td>
+                      <td>{t.position}</td>
+                      <td>
+                        <pre>{t.value}</pre>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              "Open to inspect tokens."
+            )}
           </div>
         </div>
       </div>

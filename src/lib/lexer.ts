@@ -1,4 +1,4 @@
-// Lexer analyzes the input string and outpust an array of tokens.
+// Lexer analyzes the input string and outputs an array of tokens.
 // Also returning the number of lines and an array of errors (if any).
 // Can add much more functionality here as project grows.
 
@@ -21,6 +21,8 @@ type LexerResult = {
 
 export interface Token {
   type: TokenType;
+  line: number;
+  position: number;
   value: TokenValue;
   raw: string;
 }
@@ -39,6 +41,8 @@ export default function tokenize(input: string): LexerResult {
   while (cursor < length) {
     // Handle whitespace
     if (/\s/.test(char)) {
+      const position = cursor;
+      const line = numLines;
       let value = "";
       while (/\s/.test(char)) {
         if (/\n/.test(char)) numLines++;
@@ -48,6 +52,8 @@ export default function tokenize(input: string): LexerResult {
 
       tokens.push({
         type: "whitespace",
+        line,
+        position,
         value: JSON.stringify(value),
         raw: value,
       });
@@ -63,9 +69,17 @@ export default function tokenize(input: string): LexerResult {
       char === "[" ||
       char === "]"
     ) {
+      const position = cursor;
+      const line = numLines;
       mostRecentPunctuator = char;
       if (/[{}[\]]/.test(char)) mostRecentBrace = char;
-      tokens.push({ type: "punctuator", value: char, raw: char });
+      tokens.push({
+        type: "punctuator",
+        line,
+        position,
+        value: char,
+        raw: char,
+      });
       cursor++;
       char = input[cursor];
       continue;
@@ -77,6 +91,8 @@ export default function tokenize(input: string): LexerResult {
       (mostRecentPunctuator === "{" ||
         (mostRecentPunctuator === "," && mostRecentBrace !== "["))
     ) {
+      const position = cursor;
+      const line = numLines;
       let value = "";
       char = input[++cursor];
       while (
@@ -87,13 +103,21 @@ export default function tokenize(input: string): LexerResult {
         char = input[++cursor];
       }
 
-      tokens.push({ type: "string_key", value: value, raw: `"${value}"` });
+      tokens.push({
+        type: "string_key",
+        line,
+        position,
+        value: value,
+        raw: `"${value}"`,
+      });
       char = input[++cursor];
       continue;
     }
 
     // Handle string values
     if (char === '"') {
+      const position = cursor;
+      const line = numLines;
       let value = "";
       char = input[++cursor];
 
@@ -105,13 +129,21 @@ export default function tokenize(input: string): LexerResult {
         char = input[++cursor];
       }
 
-      tokens.push({ type: "string_value", value: value, raw: `"${value}"` });
+      tokens.push({
+        type: "string_value",
+        line,
+        position,
+        value: value,
+        raw: `"${value}"`,
+      });
       char = input[++cursor];
       continue;
     }
 
     // Handle numbers
     if (/\d/.test(char)) {
+      const position = cursor;
+      const line = numLines;
       let value = "";
       while (
         /\d/.test(char) ||
@@ -124,7 +156,13 @@ export default function tokenize(input: string): LexerResult {
         char = input[++cursor];
       }
 
-      tokens.push({ type: "number", value: Number(value), raw: value });
+      tokens.push({
+        type: "number",
+        line,
+        position,
+        value: Number(value),
+        raw: value,
+      });
       continue;
     }
 
@@ -135,11 +173,19 @@ export default function tokenize(input: string): LexerResult {
       booleanRegex.test(input.substring(cursor)) ||
       nullRegex.test(input.substring(cursor))
     ) {
+      const position = cursor;
+      const line = numLines;
       const match =
         input.substring(cursor).match(booleanRegex) ||
         input.substring(cursor).match(nullRegex);
       const keyword = match?.[0] || "";
-      tokens.push({ type: "literal", value: keyword, raw: keyword });
+      tokens.push({
+        type: "literal",
+        line,
+        position,
+        value: keyword,
+        raw: keyword,
+      });
       cursor += keyword.length;
       char = input[cursor];
       continue;
@@ -147,6 +193,8 @@ export default function tokenize(input: string): LexerResult {
 
     // Handle Unrecognized input
     let value = "";
+    const position = cursor;
+    const line = numLines;
     while (cursor < length && !/[{}[\]:,\s]/.test(char)) {
       value += char;
       cursor++;
@@ -154,6 +202,8 @@ export default function tokenize(input: string): LexerResult {
     }
     tokens.push({
       type: "invalid",
+      line,
+      position,
       value: value,
       raw: value,
     });

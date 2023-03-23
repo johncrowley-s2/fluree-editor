@@ -6,6 +6,7 @@ import { useMemo, useRef, useState } from "react";
 import { debounce } from "../lib/debounce";
 import getCaretCoordinates from "../lib/getCaretCoordinates";
 import useTheme from "../lib/hooks/useTheme";
+import AutoComplete from "./AutoComplete";
 import HoverCard from "./HoverCard";
 
 interface Props {
@@ -27,26 +28,24 @@ export default function Editor({
   numLines,
   readonly = false,
 }: Props) {
-  const [showAutocomplete, setShowAutocomplete] = useState(false);
+  const [isAutoCompleteVisible, setIsAutoCompleteVisible] = useState(false);
 
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
   const { theme } = useTheme();
 
   const flashAutocomplete = debounce(() => {
-    setShowAutocomplete(true);
-    setTimeout(() => setShowAutocomplete(false), 3000);
+    if (isAutoCompleteVisible) return;
+    setIsAutoCompleteVisible(true);
+    setTimeout(() => setIsAutoCompleteVisible(false), 3000);
   }, 200);
 
-  const caretCoordinates = useMemo(() => {
+  const { top, left } = useMemo(() => {
     if (editorRef.current) {
-      const coordinates = getCaretCoordinates(editorRef.current);
       flashAutocomplete();
-      return {
-        top: coordinates.top,
-        left: coordinates.left,
-      };
+      return getCaretCoordinates(editorRef.current);
     }
+    return { top: 0, left: 0 };
   }, [value]);
 
   return (
@@ -127,25 +126,11 @@ export default function Editor({
               }}
             />
           )}
-          {showAutocomplete && caretCoordinates ? (
-            <div
-              id="autocomplete"
-              style={{
-                maxWidth: "16rem",
-                position: "absolute",
-                top: caretCoordinates.top,
-                left: caretCoordinates.left,
-                padding: "0.3rem",
-                backgroundColor: theme.backgroundColor,
-                color: theme.defaultTextColor,
-                border: `1px solid ${theme.defaultTextColor}`,
-                fontSize: 12,
-                fontFamily: "sans-serif",
-              }}
-            >
-              TODO: AUTOCOMPLETE GOES HERE
-            </div>
-          ) : null}
+          <AutoComplete
+            isVisible={isAutoCompleteVisible}
+            top={top}
+            left={left}
+          />
         </div>
       </div>
       <HoverCard />

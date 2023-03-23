@@ -11,7 +11,6 @@ The `Editor.tsx` component itself is pretty dumb... It consists of a `pre` with 
 
 Most of the magic happens in the props that get passed in to the editor. The `value` and `onValueChange` props work like any other controlled React component. The `render` prop (which probably needs a better name to avoid confusion with the React concept of "render props") should return an html string which will get rendered into the `pre`. **It is up to the consumer of the `Editor` component to ensure that the text content lines up perfectly!!**. I may change this to render JSX instead of html or to handle both cases, idk. JSX would be more powerful, and might be more performant thanks to React's reconciliation/diffing process, but would make the code a little less portable since JSX kinda locks one into the React ecosystem. More research is needed.
 
-The "lib" folder contains a basic JSON lexer which splits the input string into an array of tokens. Currently this code only performs lexical analysis and emits errors for invalid tokens, but semantic analysis is coming soon!
+The "lib" folder contains a basic JSON lexer which splits the input string into an array of tokens. Currently this code only performs lexical analysis and emits errors for invalid tokens. I'm just using `JSON.parse` to catch syntax errors and this works fine for now but may add more semantic analysis logic at some point.
 
-Currently there is an effect in `App.tsx` which handles showing a "tooltip" (once again a better name is needed) when you hover over a JSON-LD reserved keyword. This was put there for demo purposes; I plan to make a better system for displaying tooltips, hints, auto-complete suggestions, and other intellisense.
-UPDATE 3/22/23 Autocomplete is now a work-in-progress.
+Hover cards, hints, auto-complete suggestions, and other intellisense are a work-in-progress.

@@ -1,82 +1,22 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Editor from "./components/Editor";
-import { debounce } from "./lib/debounce";
-import getCaretCoordinates, { Coordinates } from "./lib/getCaretCoordinates";
+import Errors from "./components/Errors";
+import TokenInspector from "./components/TokenInspector";
+import Toolbar from "./components/Toolbar";
+import useTheme, { ThemeProvider } from "./lib/hooks/useTheme";
 import { initValue } from "./lib/initValue";
-import {
-  JldKeyword,
-  JSON_LD_KEYWORDS,
-  JSON_LD_KEYWORD_DESCRIPTIONS,
-} from "./lib/jsonLd";
-import tokenize, { Token } from "./lib/lexer";
-import {
-  altDarkTheme,
-  altLightTheme,
-  darkTheme,
-  lightTheme,
-  Theme,
-} from "./themes";
+import { JSON_LD_KEYWORDS } from "./lib/jsonLd";
+import tokenize from "./lib/lexer";
 
 function App() {
   const [value, setValue] = useState(initValue);
-  const [tokens, setTokens] = useState<Token[]>([]);
-  const [errors, setErrors] = useState<string[]>([]);
-  const [numLines, setNumLines] = useState(0);
-  const [theme, setTheme] = useState<Theme>(lightTheme);
   const [showLineNumbers, setShowLineNumbers] = useState(true);
-  const [showTokens, setShowTokens] = useState(false);
   const [highlight, setHighlight] = useState(true);
   const [readonly, setReadonly] = useState(false);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const [tooltipPosition, setTooltipPosition] = useState({ x: 0, y: 0 });
-  const [currentKeyword, setCurrentKeyword] = useState<JldKeyword>("@context");
 
-  useEffect(() => {
-    // Lexer tokenizes input string whenever it changes
-    const { tokens, errors, numLines } = tokenize(value);
-    setTokens(tokens);
-    setErrors(errors);
-    setNumLines(numLines);
-  }, [value]);
+  const { tokens, errors, numLines } = useMemo(() => tokenize(value), [value]);
 
-  useEffect(() => {
-    // Effect for showing the "tooltip" thing (need a better term but yea...)
-    // Doing some hacky shit here to find the overlapping span element behind the text area.
-
-    // Debounced handleMouseMove function with a 200ms delay
-    const handleMouseMoveDebounced = debounce(handleMouseMove, 200);
-
-    function handleMouseMove(e: MouseEvent) {
-      setTooltipPosition({ x: e.clientX, y: e.clientY });
-      // All the elements the mouse is currently overlapping with
-      const _overlapped = document.elementsFromPoint(e.pageX, e.pageY);
-      // Check to see if any element id matches an id in elems
-      const _included = _overlapped.filter(
-        (el) => el.id.split("_")[0] === "jldKeyword"
-      );
-      const ids = _included.map((el) => el.id);
-
-      const elems = Array.from(
-        document.querySelectorAll('[id^="jldKeyword"]')
-      ).map((x) => x.id);
-
-      for (const index in elems) {
-        const id = elems[index];
-        const elem = document.getElementById(id);
-        if (elem && ids.includes(id)) {
-          setCurrentKeyword(id.split("_")[1] as JldKeyword);
-          setTimeout(() => setShowTooltip(true), 800);
-        } else {
-          setShowTooltip(false);
-        }
-      }
-    }
-
-    document.addEventListener("mousemove", handleMouseMoveDebounced);
-
-    return () =>
-      document.removeEventListener("mousemove", handleMouseMoveDebounced);
-  }, []);
+  const { theme } = useTheme();
 
   function render(): string {
     // This function renders the tokenized input into an html string.
@@ -106,15 +46,8 @@ function App() {
       .join("");
   }
 
-  function handleChangeTheme(e: React.ChangeEvent<HTMLSelectElement>) {
-    if (e.target.value === "light1") setTheme(lightTheme);
-    if (e.target.value === "light2") setTheme(altLightTheme);
-    if (e.target.value === "dark1") setTheme(darkTheme);
-    if (e.target.value === "dark2") setTheme(altDarkTheme);
-  }
-
   return (
-    <>
+    <ThemeProvider>
       <div style={{ display: "flex", alignItems: "baseline" }}>
         <h2>Fluree Editor </h2>&nbsp;
         <a
@@ -138,128 +71,23 @@ function App() {
           value={value}
           onValueChange={(x) => setValue(x)}
           render={highlight ? render : () => value}
-          theme={theme}
           numLines={numLines}
           showLineNumbers={showLineNumbers}
         />
       </div>
-      <div style={{ padding: "1rem" }}>
-        <select onChange={handleChangeTheme}>
-          <option value="light1">Light theme 1</option>
-          <option value="light2">Light theme 2</option>
-          <option value="dark1">Dark theme 1</option>
-          <option value="dark2">Dark theme 2</option>
-        </select>
-        &nbsp;
-        <input
-          type="checkbox"
-          id="lineNums"
-          name="lineNums"
-          value="lineNums"
-          checked={showLineNumbers}
-          onChange={(e) => setShowLineNumbers(e.target.checked)}
-        />
-        <label htmlFor="lineNums"> Line Numbers</label>
-        &nbsp;
-        <input
-          type="checkbox"
-          id="highlight"
-          name="highlight"
-          value="highlight"
-          checked={highlight}
-          onChange={(e) => setHighlight(e.target.checked)}
-        />
-        <label htmlFor="highlight"> Syntax Highlighting</label>
-        &nbsp;
-        <input
-          type="checkbox"
-          id="readonly"
-          name="readonly"
-          value="readonly"
-          checked={readonly}
-          onChange={(e) => setReadonly(e.target.checked)}
-        />
-        <label htmlFor="readonly"> Readonly</label>
-        <hr />
-        <div>
-          Analyzed <b>{numLines}</b> lines and found <b>{tokens.length}</b>{" "}
-          tokens in document with <b>{errors.length}</b> lexical error
-          {errors.length === 1 ? "" : "s"}
-          {errors.length === 0 ? "." : ":"}
-        </div>
-        <ul>
-          {errors.map((e) => (
-            <li key={e}>{e}</li>
-          ))}
-        </ul>
-        <hr />
-        <div style={{ width: "100%", height: "100%" }}>
-          <div style={{ display: "flex" }}>
-            <button
-              style={{ alignSelf: "center", marginRight: "1rem" }}
-              onClick={() => setShowTokens(!showTokens)}
-            >
-              {showTokens ? "Close" : "Open"}
-            </button>
-            <h3>Inspect Tokens ({tokens.length}):</h3>
-          </div>
-          <div>
-            {showTokens ? (
-              <table>
-                <thead>
-                  <tr>
-                    <th>Index</th>
-                    <th>Type</th>
-                    <th>Line</th>
-                    <th>Position</th>
-                    <th>Value</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {tokens.map((t, i) => (
-                    <tr key={t.type + i}>
-                      <td>{i}</td>
-                      <td>
-                        <pre style={{ color: theme.tokenColors[t.type] }}>
-                          {t.type}
-                        </pre>
-                      </td>
-                      <td>{t.line}</td>
-                      <td>{t.position}</td>
-                      <td>
-                        <pre>{t.value}</pre>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              "Open to inspect tokens."
-            )}
-          </div>
-        </div>
-      </div>
-      {showTooltip ? (
-        <div
-          id="tooltip"
-          style={{
-            maxWidth: "16rem",
-            position: "fixed",
-            top: tooltipPosition.y,
-            left: tooltipPosition.x,
-            padding: "1rem",
-            backgroundColor: theme.backgroundColor,
-            color: theme.defaultTextColor,
-            border: `1px solid ${theme.defaultTextColor}`,
-            fontSize: 14,
-            fontFamily: "sans-serif",
-          }}
-        >
-          <b>{currentKeyword}:</b>{" "}
-          {JSON_LD_KEYWORD_DESCRIPTIONS[currentKeyword]}
-        </div>
-      ) : null}
-    </>
+      <Toolbar
+        showLineNumbers={showLineNumbers}
+        setShowLineNumbers={setShowLineNumbers}
+        highlight={highlight}
+        setHighlight={setHighlight}
+        readonly={readonly}
+        setReadonly={setReadonly}
+      />
+      <hr />
+      <Errors numLines={numLines} numTokens={tokens.length} errors={errors} />
+      <hr />
+      <TokenInspector tokens={tokens} />
+    </ThemeProvider>
   );
 }
 

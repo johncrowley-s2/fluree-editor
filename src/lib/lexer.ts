@@ -2,6 +2,8 @@
 // Also returning the number of lines and an array of errors (if any).
 // Can add much more functionality here as project grows.
 
+import { removeQuotes } from "./removeQuotes";
+
 type TokenType =
   | "whitespace"
   | "punctuator"
@@ -93,7 +95,7 @@ export default function tokenize(input: string): LexerResult {
     ) {
       const position = cursor;
       const line = numLines;
-      let value = "";
+      let value = char;
       char = input[++cursor];
       while (
         cursor < length &&
@@ -103,12 +105,14 @@ export default function tokenize(input: string): LexerResult {
         char = input[++cursor];
       }
 
+      if (char === '"') value += char;
+
       tokens.push({
         type: "string_key",
         line,
         position,
-        value: value,
-        raw: `"${value}"`,
+        value: removeQuotes(value), // Remove quotes. Is there a less hacky way to do this?
+        raw: value,
       });
       char = input[++cursor];
       continue;
@@ -118,7 +122,7 @@ export default function tokenize(input: string): LexerResult {
     if (char === '"') {
       const position = cursor;
       const line = numLines;
-      let value = "";
+      let value = char;
       char = input[++cursor];
 
       while (
@@ -129,12 +133,14 @@ export default function tokenize(input: string): LexerResult {
         char = input[++cursor];
       }
 
+      if (char === '"') value += char;
+
       tokens.push({
         type: "string_value",
         line,
         position,
-        value: value,
-        raw: `"${value}"`,
+        value: removeQuotes(value), // Remove quotes. Is there a less hacky way to do this?
+        raw: value,
       });
       char = input[++cursor];
       continue;
@@ -208,8 +214,18 @@ export default function tokenize(input: string): LexerResult {
       raw: value,
     });
     errors.push(
-      "Invalid token " + value + " at position " + (cursor - value.length)
+      "LexicalError: Invalid token " +
+        value +
+        " at position " +
+        (cursor - value.length)
     );
+  }
+
+  // Finally let's use the built-in JSON parser to find syntax error(s):
+  try {
+    JSON.parse(input);
+  } catch (e: any) {
+    errors.push(e.toString() || "Unknown syntax error");
   }
 
   return {

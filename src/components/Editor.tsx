@@ -38,15 +38,20 @@ export default function Editor({
 
   useEffect(() => {
     if (editorRef.current) {
-      const coordinates = getCaretCoordinates(
-        editorRef.current,
-        editorRef.current.selectionStart
-      );
+      const coordinates = getCaretCoordinates(editorRef.current);
       setCaretCoordinates({
         top: coordinates.top + 8,
         left: coordinates.left,
       });
       flashAutocomplete();
+      console.log(
+        "LINE: ",
+        editorRef.current.value
+          .substring(0, editorRef.current.selectionStart)
+          .split("\n").length,
+        "POSITION: ",
+        editorRef.current.selectionStart
+      );
     }
   }, [value]);
 
@@ -78,11 +83,13 @@ export default function Editor({
               position: "absolute",
               fontFamily: "inherit",
               height: "max-content",
-              width: "1.7rem",
+              width: "1.4rem",
               color: theme.defaultTextColor,
               userSelect: "none",
               borderRight: "1px solid black",
+              paddingRight: "0.3rem",
               paddingLeft: "0.3rem",
+              textAlign: "right",
             }}
           >
             {[...Array(numLines)].map((_, i) => (
@@ -116,6 +123,24 @@ export default function Editor({
             value={value}
             onChange={(e) => onValueChange(e.target.value)}
             spellCheck="false"
+            onMouseUp={() => {
+              if (editorRef.current) {
+                const coordinates = getCaretCoordinates(editorRef.current);
+                setCaretCoordinates({
+                  top: coordinates.top + 8,
+                  left: coordinates.left,
+                });
+                flashAutocomplete();
+                console.log(
+                  "LINE: ",
+                  editorRef.current.value
+                    .substring(0, editorRef.current.selectionStart)
+                    .split("\n").length,
+                  "POSITION: ",
+                  editorRef.current.selectionStart
+                );
+              }
+            }}
           />
         )}
         {showAutocomplete ? (

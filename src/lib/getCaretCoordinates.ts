@@ -3,44 +3,16 @@ export interface Coordinates {
   left: number;
 }
 
-const properties = [
-  "direction",
-  "boxSizing",
-  "width",
-  "height",
-  "overflowX",
-  "overflowY",
-  "borderTopWidth",
-  "borderRightWidth",
-  "borderBottomWidth",
-  "borderLeftWidth",
-  "borderStyle",
-  "paddingTop",
-  "paddingRight",
-  "paddingBottom",
-  "paddingLeft",
-  "fontStyle",
-  "fontVariant",
-  "fontWeight",
-  "fontStretch",
-  "fontSize",
-  "fontSizeAdjust",
-  "lineHeight",
-  "fontFamily",
-  "textAlign",
-  "textTransform",
-  "textIndent",
-  "textDecoration",
-  "letterSpacing",
-  "wordSpacing",
-  "tabSize",
-  "MozTabSize",
-];
+const DEBUG = false;
 
-function getCaretCoordinates(
-  element: HTMLTextAreaElement,
-  position: number
-): Coordinates {
+function getCaretCoordinates(element: HTMLTextAreaElement): Coordinates {
+  if (DEBUG) {
+    const el = document.querySelector("#caret-position-mirror-div");
+    if (el) el.parentNode?.removeChild(el);
+  }
+
+  const position = element.selectionStart;
+
   // The mirror div will replicate the textarea's style
   const div = document.createElement("div");
   div.id = "caret-position-mirror-div";
@@ -50,15 +22,14 @@ function getCaretCoordinates(
   const computed = window.getComputedStyle(element);
 
   // Default textarea styles
-  style.whiteSpace = "pre-wrap";
-  style.wordWrap = "break-word";
+  style.whiteSpace = "pre";
+  style.overflowWrap = "normal";
 
   // Position off-screen
   style.position = "absolute"; // required to return coordinates properly
-  style.visibility = "hidden"; // not 'display: none' because we want rendering
+  if (!DEBUG) style.visibility = "hidden"; // not 'display: none' because we want rendering
 
-  // Transfer the element's properties to the div
-  properties.forEach((prop) =>
+  Object.keys(computed).forEach((prop) =>
     style.setProperty(prop, computed.getPropertyValue(prop))
   );
 
@@ -70,11 +41,15 @@ function getCaretCoordinates(
   div.appendChild(span);
 
   const coordinates = {
-    top: span.offsetTop + parseInt(computed["borderTopWidth"]),
-    left: span.offsetLeft + parseInt(computed["borderLeftWidth"]),
+    top: span.offsetTop + parseInt(computed["borderTopWidth"]) + 8, // Add 10 pixels to compensate for some mysterious inaccuracy
+    left: span.offsetLeft + parseInt(computed["borderLeftWidth"]) + 24, // Add 16 pixels to compensate for some mysterious inaccuracy
   };
 
-  document.body.removeChild(div);
+  if (!DEBUG) {
+    document.body.removeChild(div);
+  } else {
+    span.style.backgroundColor = "#aaa";
+  }
 
   return coordinates;
 }

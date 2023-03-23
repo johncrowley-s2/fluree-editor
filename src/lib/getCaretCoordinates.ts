@@ -1,3 +1,7 @@
+// Get the position of the text caret in a textarea.
+// We do this by creating a hidden div with identical styling to the textarea.
+// This approach was inspired by https://github.com/component/textarea-caret-position
+
 export interface Coordinates {
   top: number;
   left: number;

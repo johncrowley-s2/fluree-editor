@@ -44,14 +44,6 @@ export default function Editor({
         left: coordinates.left,
       });
       flashAutocomplete();
-      console.log(
-        "LINE: ",
-        editorRef.current.value
-          .substring(0, editorRef.current.selectionStart)
-          .split("\n").length,
-        "POSITION: ",
-        editorRef.current.selectionStart
-      );
     }
   }, [value]);
 

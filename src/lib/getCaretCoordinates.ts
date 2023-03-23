@@ -41,8 +41,8 @@ function getCaretCoordinates(element: HTMLTextAreaElement): Coordinates {
   div.appendChild(span);
 
   const coordinates = {
-    top: span.offsetTop + parseInt(computed["borderTopWidth"]) + 8, // Add 10 pixels to compensate for some mysterious inaccuracy
-    left: span.offsetLeft + parseInt(computed["borderLeftWidth"]) + 24, // Add 16 pixels to compensate for some mysterious inaccuracy
+    top: span.offsetTop + parseInt(computed["borderTopWidth"]) + 16, // Add 16 pixels to compensate for caret height
+    left: span.offsetLeft + parseInt(computed["borderLeftWidth"]) + 24, // Add 24 pixels to compensate for some mysterious inaccuracy that I have yet to track down.
   };
 
   if (!DEBUG) {

@@ -40,7 +40,7 @@ export default function Editor({
     if (editorRef.current) {
       const coordinates = getCaretCoordinates(editorRef.current);
       setCaretCoordinates({
-        top: coordinates.top + 8,
+        top: coordinates.top,
         left: coordinates.left,
       });
       flashAutocomplete();

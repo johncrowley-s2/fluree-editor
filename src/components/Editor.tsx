@@ -115,7 +115,7 @@ export default function Editor({
             style={{
               ...styles.editor,
               ...styles.highlight,
-              marginLeft: showLineNumbers ? "2rem" : 0,
+              marginLeft: showLineNumbers ? "3rem" : 0,
               paddingLeft: "0.6rem",
             }}
             dangerouslySetInnerHTML={{
@@ -131,7 +131,7 @@ export default function Editor({
               style={{
                 ...styles.editor,
                 ...styles.textarea,
-                marginLeft: showLineNumbers ? "2rem" : 0,
+                marginLeft: showLineNumbers ? "3rem" : 0,
                 paddingLeft: "0.6rem",
               }}
               value={value}
@@ -170,7 +170,7 @@ const styles = {
     boxSizing: "border-box",
     padding: 0,
     overflow: "hidden",
-    minHeight: "2rem",
+    minHeight: "3rem",
   },
   textarea: {
     position: "absolute",

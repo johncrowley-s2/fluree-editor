@@ -1,35 +1,33 @@
 import {
-    ChangeEvent,
-    createContext,
-    ReactNode,
-    useContext,
-    useState
+  ChangeEvent,
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
 } from "react";
-import {
-    altDarkTheme,
-    altLightTheme,
-    darkTheme,
-    lightTheme,
-    Theme
-} from "../../themes";
+import { darkTheme1 } from "../themes/darkTheme1";
+import { darkTheme2 } from "../themes/darkTheme2";
+import { lightTheme1 } from "../themes/lightTheme1";
+import { lightTheme2 } from "../themes/lightTheme2";
+import { Theme } from "../themes/types";
 
 interface Props {
   children?: ReactNode;
 }
 
 const ThemeContext = createContext({
-  theme: lightTheme,
+  theme: lightTheme1,
   handleChangeTheme: (e: ChangeEvent<HTMLSelectElement>) => {},
 });
 
 export function ThemeProvider({ children }: Props) {
-  const [theme, setTheme] = useState<Theme>(lightTheme);
+  const [theme, setTheme] = useState<Theme>(lightTheme1);
 
   function handleChangeTheme(e: React.ChangeEvent<HTMLSelectElement>) {
-    if (e.target.value === "light1") setTheme(lightTheme);
-    if (e.target.value === "light2") setTheme(altLightTheme);
-    if (e.target.value === "dark1") setTheme(darkTheme);
-    if (e.target.value === "dark2") setTheme(altDarkTheme);
+    if (e.target.value === "light1") setTheme(lightTheme1);
+    if (e.target.value === "light2") setTheme(lightTheme2);
+    if (e.target.value === "dark1") setTheme(darkTheme1);
+    if (e.target.value === "dark2") setTheme(darkTheme2);
   }
 
   return (

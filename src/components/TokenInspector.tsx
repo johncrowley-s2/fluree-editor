@@ -1,6 +1,6 @@
 import { useState } from "react";
 import useTheme from "../lib/hooks/useTheme";
-import { Token } from "../lib/lexer";
+import { Token } from "../lib/tokenize";
 
 interface Props {
   tokens: Token[];

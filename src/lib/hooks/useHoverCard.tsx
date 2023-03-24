@@ -8,7 +8,6 @@ export default function useHoverCard() {
   const [showHoverCard, setShowHoverCard] = useState(false);
 
   useEffect(() => {
-    // Effect for showing the "hoverCard" thing (need a better term but yea...)
     // Doing some hacky shit here to find the overlapping span element behind the text area.
 
     // Debounced handleMouseMove function with a 200ms delay

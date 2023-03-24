@@ -1,5 +1,8 @@
-import { Dispatch, SetStateAction } from "react";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import useTheme from "../lib/hooks/useTheme";
+import * as jsonLd from "../lib/languages/json-ld";
+import * as sql from "../lib/languages/sql";
+import { LanguageDefinition } from "../lib/languages/types";
 
 interface Props {
   showLineNumbers: boolean;
@@ -8,6 +11,8 @@ interface Props {
   setHighlight: Dispatch<SetStateAction<boolean>>;
   readonly: boolean;
   setReadonly: Dispatch<SetStateAction<boolean>>;
+  language: LanguageDefinition;
+  setLanguage: Dispatch<SetStateAction<LanguageDefinition>>;
 }
 
 export default function Toolbar({
@@ -17,8 +22,15 @@ export default function Toolbar({
   setHighlight,
   readonly,
   setReadonly,
+  language,
+  setLanguage,
 }: Props) {
   const { handleChangeTheme } = useTheme();
+
+  function handleChangeLanguage(e: ChangeEvent<HTMLSelectElement>) {
+    if (e.target.value === "sql") setLanguage(sql);
+    else setLanguage(jsonLd);
+  }
 
   return (
     <div style={{ padding: "1rem" }}>
@@ -27,6 +39,11 @@ export default function Toolbar({
         <option value="light2">Light theme 2</option>
         <option value="dark1">Dark theme 1</option>
         <option value="dark2">Dark theme 2</option>
+      </select>
+      &nbsp;
+      <select onChange={handleChangeLanguage}>
+        <option value="json-ld">JSON-LD</option>
+        <option value="sql">SQL</option>
       </select>
       &nbsp;
       <input

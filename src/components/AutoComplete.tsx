@@ -1,12 +1,19 @@
+import { ReactNode } from "react";
 import useTheme from "../lib/hooks/useTheme";
 
 interface Props {
   isVisible: boolean;
   top: number;
   left: number;
+  children: ReactNode;
 }
 
-export default function AutoComplete({ isVisible, top, left }: Props) {
+export default function AutoComplete({
+  isVisible,
+  top,
+  left,
+  children,
+}: Props) {
   const { theme } = useTheme();
 
   return (
@@ -27,7 +34,7 @@ export default function AutoComplete({ isVisible, top, left }: Props) {
             fontFamily: "sans-serif",
           }}
         >
-          TODO: AUTOCOMPLETE GOES HERE
+          {children}
         </div>
       ) : null}
     </>

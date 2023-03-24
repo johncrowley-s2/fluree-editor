@@ -1,4 +1,4 @@
-export const initValue = `{
+export const jld = `{
     "@context": {
       "@vocab": "http://schema.org/",
       "name": "http://schema.org/name",
@@ -45,3 +45,26 @@ export const initValue = `{
     "keywords": ["book", "fiction", "classic"],
     "nullValue": null
 }`;
+
+export const sql = `SELECT
+  b.id AS book_id,
+  b.name AS book_name,
+  b.description AS book_description,
+  b.image AS book_image,
+  b.dateCreated AS date_created,
+  b.creator AS creator_id,
+  b.example AS example_id,
+  b.count AS book_count,
+  b.score AS book_score,
+  b.isAvailable AS is_available,
+  b.keywords AS keywords,
+  b.nullValue AS null_value,
+  p.id AS publisher_id
+FROM books b
+LEFT JOIN books_publishers bp 
+ON b.id = bp.book_id
+LEFT JOIN publishers p 
+ON bp.publisher_id = p.id
+WHERE b.isAvailable = true
+AND b.score >= 4.0
+ORDER BY b.dateCreated DESC;`;

@@ -58,8 +58,8 @@ function App() {
       />
       {/* <hr /> */}
       {/* <Errors numLines={numLines} numTokens={tokens.length} errors={errors} /> */}
-      {/* <hr />
-      <TokenInspector tokens={tokens} /> */}
+      {/* <hr /> */}
+      <TokenInspector value={value} language={language} />
     </ThemeProvider>
   );
 }

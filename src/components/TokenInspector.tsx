@@ -1,15 +1,22 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import useTheme from "../lib/hooks/useTheme";
-import { Token } from "../lib/tokenize";
+import { LanguageDefinition } from "../lib/languages/types";
+import tokenize, { Token } from "../lib/tokenize";
 
 interface Props {
-  tokens: Token[];
+  value: string;
+  language: LanguageDefinition;
 }
 
-export default function TokenInspector({ tokens }: Props) {
+export default function TokenInspector({ value, language }: Props) {
   const [showTokens, setShowTokens] = useState(false); // Default false bc rendering the token table slows down the UI considerably
 
   const { theme } = useTheme();
+
+  const tokens = useMemo(
+    () => (!showTokens ? [] : tokenize(value, language.tokenMap)),
+    [showTokens, value]
+  );
 
   return (
     <>
@@ -41,9 +48,7 @@ export default function TokenInspector({ tokens }: Props) {
                   <tr key={t.type + i}>
                     <td>{i}</td>
                     <td>
-                      <pre style={{ color: theme.tokenColors[t.type] }}>
-                        {t.type}
-                      </pre>
+                      <pre>{t.type}</pre>
                     </td>
                     <td>{t.line}</td>
                     <td>{t.position}</td>

@@ -4,9 +4,17 @@ import getCaretCoordinates from "../lib/getCaretCoordinates";
 import useTheme from "../lib/hooks/useTheme";
 import { LanguageDefinition } from "../lib/languages/types";
 import renderTokens from "../lib/renderTokens";
-import tokenize from "../lib/tokenize";
+import tokenize, { Token } from "../lib/tokenize";
 import AutoComplete from "./AutoComplete";
 import HoverCard from "./HoverCard";
+
+type ContextType = "property" | "value" | "unknown";
+
+interface Context {
+  type: ContextType;
+  key?: string;
+  contextObj?: Record<string, any>;
+}
 
 interface Props {
   value: string;
@@ -14,7 +22,84 @@ interface Props {
   showLineNumbers: boolean;
   readonly?: boolean;
   language: LanguageDefinition;
+  getSuggestions?: (
+    tokens: Token[],
+    currentTokenIndex: number,
+    caretPosition: number
+  ) => string[];
 }
+
+function findCurrentTokenIndex(
+  tokens: Token[],
+  cursorPosition: number
+): number {
+  let currentTokenIndex = 0;
+
+  for (let i = 0; i < tokens.length; i++) {
+    const token = tokens[i];
+    if (token.position < cursorPosition) {
+      if (
+        currentTokenIndex === null ||
+        token.position > tokens[currentTokenIndex].position
+      ) {
+        currentTokenIndex = i;
+      }
+    } else {
+      break;
+    }
+  }
+
+  return currentTokenIndex;
+}
+
+// function getContext(tokens: Token[], cursorPosition: number): Context {
+//   const currentToken = findCurrentToken(tokens, cursorPosition);
+//   console.log("CURRENT TOKEN: ", currentToken);
+//   if (!currentToken) {
+//     return { type: "unknown" };
+//   }
+
+//   let key: string | undefined;
+//   let contextObj: Record<string, any> | undefined;
+
+//   switch (currentToken.type) {
+//     case "StringKey":
+//       return { type: "property", key: currentToken.value, contextObj };
+
+//     case "StringValue":
+//     case "Number":
+//     case "Boolean":
+//     case "Null":
+//       // Find the corresponding key
+//       for (let i = tokens.indexOf(currentToken) - 1; i >= 0; i--) {
+//         if (tokens[i].type === "StringKey") {
+//           key = tokens[i].value;
+//           break;
+//         }
+//       }
+
+//       // Find the "@context" object
+//       for (let i = 0; i < tokens.length; i++) {
+//         if (
+//           tokens[i].type === "StringKey" &&
+//           tokens[i].value === '"@context"'
+//         ) {
+//           try {
+//             const contextStr = tokens[i + 2]?.value;
+//             contextObj = contextStr ? JSON.parse(contextStr) : undefined;
+//           } catch (err) {
+//             // Invalid JSON in the "@context" value
+//           }
+//           break;
+//         }
+//       }
+
+//       return { type: "value", key, contextObj };
+
+//     default:
+//       return { type: "unknown" };
+//   }
+// }
 
 export default function Editor({
   value,
@@ -22,6 +107,7 @@ export default function Editor({
   showLineNumbers,
   readonly = false,
   language,
+  getSuggestions,
 }: Props) {
   const [isAutoCompleteVisible, setIsAutoCompleteVisible] = useState(false);
 
@@ -45,31 +131,12 @@ export default function Editor({
     return { top: 0, left: 0 };
   }, [value]);
 
-  const suggestions: string[] = []; //useMemo(() => {
-  //   if (!editorRef.current) return [];
-
-  //   let cursor = editorRef.current.selectionStart - 1;
-  //   let char = value[cursor];
-  //   let recentInput = "";
-
-  //   while (!/\s/.test(char)) {
-  //     recentInput = char + recentInput;
-  //     char = value[--cursor];
-  //   }
-
-  //   if (!recentInput.length) return [];
-
-  //   const result = aCsuggestions.filter((s) =>
-  //     s.includes(recentInput.toLowerCase())
-  //   );
-  //   if (!result.length) {
-  //     if (isAutoCompleteVisible) setIsAutoCompleteVisible(false);
-  //     return [];
-  //   }
-
-  //   flashAutocomplete();
-  //   return result;
-  // }, [value]);
+  const suggestions = useMemo(() => {
+    if (!getSuggestions || !editorRef.current) return [];
+    const caretPosition = editorRef.current.selectionStart;
+    const currentTokenIndex = findCurrentTokenIndex(tokens, caretPosition);
+    return getSuggestions(tokens, currentTokenIndex, caretPosition);
+  }, [tokens]);
 
   return (
     <>
@@ -102,6 +169,7 @@ export default function Editor({
                 paddingRight: "0.3rem",
                 paddingLeft: "0.3rem",
                 textAlign: "right",
+                padding: "0.7rem 0.3rem",
               }}
             >
               {[...Array(numLines)].map((_, i) => (
@@ -115,7 +183,7 @@ export default function Editor({
             style={{
               ...styles.editor,
               ...styles.highlight,
-              marginLeft: showLineNumbers ? "3rem" : 0,
+              marginLeft: showLineNumbers ? "2rem" : 0,
               paddingLeft: "0.6rem",
             }}
             dangerouslySetInnerHTML={{
@@ -131,7 +199,7 @@ export default function Editor({
               style={{
                 ...styles.editor,
                 ...styles.textarea,
-                marginLeft: showLineNumbers ? "3rem" : 0,
+                marginLeft: showLineNumbers ? "2rem" : 0,
                 paddingLeft: "0.6rem",
               }}
               value={value}
@@ -202,7 +270,7 @@ const styles = {
     fontWeight: "inherit",
     letterSpacing: "inherit",
     lineHeight: "inherit",
-    padding: 0,
+    padding: "0.7rem 0.3rem",
     tabSize: "inherit",
     textIndent: "inherit",
     textRendering: "inherit",

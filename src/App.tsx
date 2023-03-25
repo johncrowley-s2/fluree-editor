@@ -6,6 +6,7 @@ import { ThemeProvider } from "./lib/hooks/useTheme";
 import { jld, sql } from "./lib/initValue";
 import * as jsonLd from "./lib/languages/json-ld";
 import { LanguageDefinition } from "./lib/languages/types";
+import { Token } from "./lib/tokenize";
 
 function App() {
   const [value, setValue] = useState("");
@@ -18,6 +19,19 @@ function App() {
     if (language === jsonLd) setValue(jld);
     else setValue(sql);
   }, [language]);
+
+  function prettify() {
+    setValue((prev) => (language.prettify ? language.prettify(prev) : prev));
+  }
+
+  function getSuggestions(
+    tokens: Token[],
+    currentTokenIndex: number,
+    position: number
+  ) {
+    console.log(tokens[currentTokenIndex]);
+    return [];
+  }
 
   return (
     <ThemeProvider>
@@ -33,7 +47,7 @@ function App() {
       <div
         style={{
           width: "100%",
-          height: "24rem",
+          height: "48rem",
           border: "1px solid black",
           borderRadius: "4px",
         }}
@@ -44,6 +58,7 @@ function App() {
           value={value}
           onValueChange={(x) => setValue(x)}
           showLineNumbers={showLineNumbers}
+          getSuggestions={getSuggestions}
         />
       </div>
       <Toolbar
@@ -55,6 +70,7 @@ function App() {
         setReadonly={setReadonly}
         language={language}
         setLanguage={setLanguage}
+        prettify={prettify}
       />
       {/* <hr /> */}
       {/* <Errors numLines={numLines} numTokens={tokens.length} errors={errors} /> */}

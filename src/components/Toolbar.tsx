@@ -13,6 +13,7 @@ interface Props {
   setReadonly: Dispatch<SetStateAction<boolean>>;
   language: LanguageDefinition;
   setLanguage: Dispatch<SetStateAction<LanguageDefinition>>;
+  prettify: () => void;
 }
 
 export default function Toolbar({
@@ -24,6 +25,7 @@ export default function Toolbar({
   setReadonly,
   language,
   setLanguage,
+  prettify,
 }: Props) {
   const { handleChangeTheme } = useTheme();
 
@@ -45,6 +47,8 @@ export default function Toolbar({
         <option value="json-ld">JSON-LD</option>
         <option value="sql">SQL</option>
       </select>
+      &nbsp;
+      <button onClick={prettify}>Prettify</button>
       &nbsp;
       <input
         type="checkbox"

@@ -53,9 +53,11 @@ export default function tokenize(input: string, tokenMap: TokenMap): Token[] {
       }
     }
     if (!matched) {
+      addToken("Invalid", input[position]);
       position++;
       column++;
     }
   }
+
   return tokens;
 }

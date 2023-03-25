@@ -17,6 +17,7 @@ export interface Theme {
   defaultTextColor: string;
   backgroundColor: string;
   caretColor: string;
+  lineNumberColor: string;
   highlightColor: string;
   tokenColors: TokenColors;
 }

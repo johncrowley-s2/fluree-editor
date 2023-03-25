@@ -4,6 +4,7 @@ export const lightTheme1: Theme = {
   defaultTextColor: "#333333",
   backgroundColor: "#FDFDFD",
   caretColor: "#5A5A5A",
+  lineNumberColor: "#BFBFBF",
   highlightColor: "#D4E4EF",
   tokenColors: {
     Keyword: "#5A5AC5",

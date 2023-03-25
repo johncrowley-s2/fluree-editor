@@ -1,4 +1,5 @@
-export const jld = `{
+export const jld = JSON.stringify(
+  JSON.parse(`{
     "@context": {
       "@vocab": "http://schema.org/",
       "name": "http://schema.org/name",
@@ -44,7 +45,10 @@ export const jld = `{
     "isAvailable": true,
     "keywords": ["book", "fiction", "classic"],
     "nullValue": null
-}`;
+}`),
+  null,
+  "  "
+);
 
 export const sql = `SELECT
   b.id AS book_id,

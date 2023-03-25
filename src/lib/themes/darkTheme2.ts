@@ -4,6 +4,7 @@ export const darkTheme2: Theme = {
   defaultTextColor: "#F8F8F2",
   backgroundColor: "#282A36",
   caretColor: "#F1F1F1",
+  lineNumberColor: "#757575",
   highlightColor: "#44475A",
   tokenColors: {
     Keyword: "#8BE9FD",

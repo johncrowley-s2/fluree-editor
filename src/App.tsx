@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Editor from "./components/Editor";
 import TokenInspector from "./components/TokenInspector";
 import Toolbar from "./components/Toolbar";

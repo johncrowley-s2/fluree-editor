@@ -1,9 +1,9 @@
 import {
-  ChangeEvent,
-  createContext,
-  ReactNode,
-  useContext,
-  useState,
+    ChangeEvent,
+    createContext,
+    ReactNode,
+    useContext,
+    useState
 } from "react";
 import { darkTheme1 } from "../themes/darkTheme1";
 import { darkTheme2 } from "../themes/darkTheme2";

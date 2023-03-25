@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { LanguageDefinition } from "../lib/languages/types";
-import tokenize, { Token } from "../lib/tokenize";
+import tokenize from "../lib/tokenize";
 
 interface Props {
   value: string;

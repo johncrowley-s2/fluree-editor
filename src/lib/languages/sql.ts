@@ -1,4 +1,4 @@
-import tokenize, { Token, TokenMap } from "../tokenize";
+import { TokenMap } from "../tokenize";
 
 export const tokenMap: TokenMap = {
   Keyword: {

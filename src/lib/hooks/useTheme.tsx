@@ -1,14 +1,15 @@
 import {
-    ChangeEvent,
-    createContext,
-    ReactNode,
-    useContext,
-    useState
+  ChangeEvent,
+  createContext,
+  ReactNode,
+  useContext,
+  useState,
 } from "react";
 import { darkTheme1 } from "../themes/darkTheme1";
 import { darkTheme2 } from "../themes/darkTheme2";
 import { lightTheme1 } from "../themes/lightTheme1";
 import { lightTheme2 } from "../themes/lightTheme2";
+import { flureeLightTheme, flureeDarkTheme } from "../themes/fluree";
 import { Theme } from "../themes/types";
 
 interface Props {
@@ -21,9 +22,11 @@ const ThemeContext = createContext({
 });
 
 export function ThemeProvider({ children }: Props) {
-  const [theme, setTheme] = useState<Theme>(lightTheme1);
+  const [theme, setTheme] = useState<Theme>(flureeLightTheme);
 
   function handleChangeTheme(e: React.ChangeEvent<HTMLSelectElement>) {
+    if (e.target.value === "flureeLight") setTheme(flureeLightTheme);
+    if (e.target.value === "flureeDark") setTheme(flureeDarkTheme);
     if (e.target.value === "light1") setTheme(lightTheme1);
     if (e.target.value === "light2") setTheme(lightTheme2);
     if (e.target.value === "dark1") setTheme(darkTheme1);

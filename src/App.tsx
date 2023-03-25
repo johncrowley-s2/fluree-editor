@@ -44,7 +44,7 @@ function App() {
       <div style={{ display: "flex", alignItems: "baseline" }}>
         <h2>Johnaco Editor </h2>&nbsp;
         <a
-          href="https://github.com/johncrowley-s2/fluree-editor"
+          href="https://github.com/johncrowley-s2/johnaco-editor"
           target="_blank"
         >
           View code on Github

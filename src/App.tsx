@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import Editor from "./components/Editor";
 import TokenInspector from "./components/TokenInspector";
 import Toolbar from "./components/Toolbar";
+import fuzzySearch from "./lib/fuzzySearch";
 import { ThemeProvider } from "./lib/hooks/useTheme";
 import { jld, sql } from "./lib/initValue";
 import * as jsonLd from "./lib/languages/json-ld";
 import { LanguageDefinition } from "./lib/languages/types";
 import { Token } from "./lib/tokenize";
+import { testSuggestions } from "./testSuggestions";
 
 function App() {
   const [value, setValue] = useState("");
@@ -29,8 +31,12 @@ function App() {
     currentTokenIndex: number,
     position: number
   ) {
-    console.log(tokens[currentTokenIndex]);
-    return [];
+    const currentToken = tokens[currentTokenIndex];
+    if (!currentToken) return [];
+    const value = currentToken.value;
+    if (/\W+/.test(value)) return [];
+    console.log("VALUE: ", value);
+    return fuzzySearch(value, testSuggestions).slice(0, 5);
   }
 
   return (

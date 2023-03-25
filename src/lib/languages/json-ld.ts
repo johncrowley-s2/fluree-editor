@@ -2,26 +2,24 @@ import { TokenMap } from "../tokenize";
 
 export const tokenMap: TokenMap = {
   StringKey: {
-    pattern: /^"(?:\\.|[^"\\])*"(?=\s*:)/,
+    pattern: /^"(?:\\.|[^\n\r"\\])*?"(?=\s*:)/,
     tokenClass: "Keyword",
   },
-  StringValue: { pattern: /^"(?:\\.|[^"\\])*"/, tokenClass: "String" },
+  StringValue: { pattern: /^"(?:\\.|[^\n\r"\\])*?"/, tokenClass: "String" },
   Number: {
     pattern: /^-?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?/,
     tokenClass: "Numeric",
   },
   Boolean: { pattern: /^(?:true|false)(?=[\s\]\},]|$)/, tokenClass: "Ext1" },
   Null: { pattern: /^null/, tokenClass: "Ext3" },
-  Whitespace: { pattern: /^\s+/ },
+  Whitespace: { pattern: /^[\s]+/ },
   Punctuation: { pattern: /^(?:[{}\[\],:])/, tokenClass: "Punctuation" },
   IncompleteString: {
-    pattern: /^"(?:\\.|[^"\\])*$/,
+    pattern: /^"(?:\\.|[^\n\r"\\])*$/,
     tokenClass: "Invalid",
   },
-  Invalid: {
-    pattern: /^(?:[^\s"0-9\[\]{},:tfn-]+|(?:t(?!rue)|f(?!alse)|n(?!ull)))+/,
-    tokenClass: "Invalid",
-  },
+  Invalid: { pattern: /.*/, tokenClass: "Invalid" },
+  Newline: { pattern: /^(\r\n|\r|\n)/ },
 };
 
 export function prettify(jsonString: string): string {

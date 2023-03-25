@@ -131,12 +131,17 @@ export default function Editor({
     return { top: 0, left: 0 };
   }, [value]);
 
+  const currentTokenIndex = useMemo(() => {
+    if (!editorRef.current) return 0;
+    const caretPosition = editorRef.current.selectionStart;
+    return findCurrentTokenIndex(tokens, caretPosition);
+  }, [tokens]);
+
   const suggestions = useMemo(() => {
     if (!getSuggestions || !editorRef.current) return [];
     const caretPosition = editorRef.current.selectionStart;
-    const currentTokenIndex = findCurrentTokenIndex(tokens, caretPosition);
     return getSuggestions(tokens, currentTokenIndex, caretPosition);
-  }, [tokens]);
+  }, [tokens, currentTokenIndex]);
 
   return (
     <>
@@ -219,7 +224,7 @@ export default function Editor({
               }}
             />
           )}
-          <AutoComplete isVisible={isAutoCompleteVisible} top={top} left={left}>
+          <AutoComplete isVisible={suggestions.length > 0} top={top} left={left}>
             {suggestions.map((s) => (
               <div key={s}>{s}</div>
             ))}

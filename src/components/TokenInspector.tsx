@@ -32,19 +32,19 @@ export default function TokenInspector({ value, language }: Props) {
 
   return (
     <>
-      <div style={{ width: "100%", height: "100%" }}>
+      <div style={{ width: "100%", height: "100%", paddingTop: "1rem" }}>
         <div style={{ display: "flex" }}>
           <button
             style={{ alignSelf: "center", marginRight: "1rem" }}
             onClick={() => setShowTokens(!showTokens)}
           >
-            {showTokens ? "Close" : "Open"}
+            {showTokens ? "Close Token Inspector" : "Open Token Inspector"}
           </button>
-          <h3>Inspect Tokens:</h3>
         </div>
         <div>
           {showTokens ? (
             <>
+              <h3>Inspect Tokens:</h3>
               <select
                 onChange={(e) => setFilterType(e.target.value)}
                 style={{ alignSelf: "center", marginBottom: "1rem" }}
@@ -81,9 +81,7 @@ export default function TokenInspector({ value, language }: Props) {
                 </tbody>
               </table>
             </>
-          ) : (
-            "^Open to inspect tokens."
-          )}
+          ) : null}
         </div>
       </div>
     </>

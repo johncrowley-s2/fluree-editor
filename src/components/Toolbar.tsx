@@ -36,6 +36,8 @@ export default function Toolbar({
 
   return (
     <div>
+      <button onClick={prettify}>Prettify</button>
+      &nbsp;
       <select onChange={handleChangeTheme}>
         <option value="flureeLight">Fluree Light Theme</option>
         <option value="flureeDark">Fluree Dark Theme</option>
@@ -49,8 +51,6 @@ export default function Toolbar({
         <option value="json-ld">JSON-LD</option>
         <option value="sql">SQL</option>
       </select>
-      &nbsp;
-      <button onClick={prettify}>Prettify</button>
       &nbsp;
       <input
         type="checkbox"

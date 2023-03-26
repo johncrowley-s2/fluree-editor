@@ -2,7 +2,7 @@ import { Theme } from "./types";
 
 export const flureeLightTheme: Theme = {
   defaultTextColor: "#333333",
-  backgroundColor: "#F7F7F7",
+  backgroundColor: "#FCFCFC",
   caretColor: "#5A5A5A",
   lineNumberColor: "#888888",
   highlightColor: "#FFF8DC",

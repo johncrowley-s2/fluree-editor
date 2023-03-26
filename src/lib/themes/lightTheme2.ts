@@ -2,7 +2,7 @@ import { Theme } from "./types";
 
 export const lightTheme2: Theme = {
   defaultTextColor: "#2C3E50",
-  backgroundColor: "#F7F7F7",
+  backgroundColor: "#FCFCFC",
   caretColor: "#34495E",
   lineNumberColor: "#A6A6A6",
   highlightColor: "#D7E5F5",

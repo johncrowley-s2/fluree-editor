@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import getCaretCoordinates from "../lib/getCaretCoordinates";
 import useTheme from "../lib/hooks/useTheme";
 import { LanguageDefinition } from "../lib/languages/types";
@@ -7,7 +7,6 @@ import tokenize, { Token } from "../lib/tokenize";
 import AutoComplete from "./AutoComplete";
 import Checkmark from "./Checkmark";
 import HoverCard from "./HoverCard";
-import XMark from "./XMark";
 
 type ContextType = "property" | "value" | "unknown";
 

@@ -1,5 +1,4 @@
 import { useMemo, useRef, useState } from "react";
-import { debounce } from "../lib/debounce";
 import getCaretCoordinates from "../lib/getCaretCoordinates";
 import useTheme from "../lib/hooks/useTheme";
 import { LanguageDefinition } from "../lib/languages/types";

@@ -1,4 +1,4 @@
-import { ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import useTheme from "../lib/hooks/useTheme";
 
 function incrementIndex(currentIndex: number, arrayLength: number) {

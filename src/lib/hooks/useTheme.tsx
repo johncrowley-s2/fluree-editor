@@ -3,13 +3,13 @@ import {
   createContext,
   ReactNode,
   useContext,
-  useState,
+  useState
 } from "react";
 import { darkTheme1 } from "../themes/darkTheme1";
 import { darkTheme2 } from "../themes/darkTheme2";
+import { flureeDarkTheme, flureeLightTheme } from "../themes/fluree";
 import { lightTheme1 } from "../themes/lightTheme1";
 import { lightTheme2 } from "../themes/lightTheme2";
-import { flureeLightTheme, flureeDarkTheme } from "../themes/fluree";
 import { Theme } from "../themes/types";
 
 interface Props {

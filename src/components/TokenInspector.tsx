@@ -44,7 +44,6 @@ export default function TokenInspector({ value, language }: Props) {
         <div>
           {showTokens ? (
             <>
-              <h3>Inspect Tokens:</h3>
               <select
                 onChange={(e) => setFilterType(e.target.value)}
                 style={{ alignSelf: "center", marginBottom: "1rem" }}

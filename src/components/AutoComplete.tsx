@@ -53,14 +53,16 @@ export default function AutoComplete({
       <div
         id="autocomplete"
         style={{
+          minWidth: "8rem",
           maxWidth: "16rem",
           position: "absolute",
           top: top,
           left: left,
-          padding: "0.3rem",
+          padding: "0.5rem",
           backgroundColor: theme.backgroundColor,
           color: theme.defaultTextColor,
           border: `1px solid ${theme.defaultTextColor}`,
+          borderRadius: "4px",
           fontSize: 12,
           fontFamily: "sans-serif",
         }}
@@ -70,8 +72,10 @@ export default function AutoComplete({
             key={s}
             style={{
               userSelect: "none",
+              padding: "0.1rem 0.3rem",
+              borderRadius: "4px",
               ...(activeIndex === i
-                ? { backgroundColor: theme.highlightColor }
+                ? { border: "1px solid " + theme.defaultTextColor }
                 : {}),
             }}
             onMouseEnter={() => setActiveIndex(i)}

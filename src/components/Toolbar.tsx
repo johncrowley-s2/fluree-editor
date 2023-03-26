@@ -35,7 +35,7 @@ export default function Toolbar({
   }
 
   return (
-    <div style={{ padding: "1rem" }}>
+    <div>
       <select onChange={handleChangeTheme}>
         <option value="flureeLight">Fluree Light Theme</option>
         <option value="flureeDark">Fluree Dark Theme</option>

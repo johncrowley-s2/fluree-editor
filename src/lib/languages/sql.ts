@@ -1,5 +1,7 @@
 import { TokenMap } from "../tokenize";
 
+export const displayName = "SQL";
+
 export const tokenMap: TokenMap = {
   Keyword: {
     pattern:

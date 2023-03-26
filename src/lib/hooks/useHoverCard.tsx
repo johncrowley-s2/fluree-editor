@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 import { debounce } from "../debounce";
-import { JldKeyword, JSON_LD_KEYWORD_DESCRIPTIONS } from "../jsonLd";
 import { removeQuotes } from "../removeQuotes";
 
-export default function useHoverCard() {
+export default function useHoverCard(hoverCards: Record<string, string>) {
   const [hoverCardPosition, setHoverCardPosition] = useState({ x: 0, y: 0 });
-  const [currentKeyword, setCurrentKeyword] = useState<JldKeyword>("@context");
+  const [currentKeyword, setCurrentKeyword] = useState<string>("");
   const [showHoverCard, setShowHoverCard] = useState(false);
 
   useEffect(() => {
@@ -20,19 +19,19 @@ export default function useHoverCard() {
       const _overlapped = document.elementsFromPoint(e.pageX, e.pageY);
       // Check to see if any element id matches an id in elems
       const _included = _overlapped.filter(
-        (el) => el.id.split("_")[0] === "jldKeyword"
+        (el) => el.id.split("_")[0] === "hovercard"
       );
       const ids = _included.map((el) => el.id);
 
       const elems = Array.from(
-        document.querySelectorAll('[id^="jldKeyword"]')
+        document.querySelectorAll('[id^="hovercard"]')
       ).map((x) => x.id);
 
       for (const index in elems) {
         const id = elems[index];
         const elem = document.getElementById(id);
         if (elem && ids.includes(id)) {
-          setCurrentKeyword(removeQuotes(id.split("_")[1]) as JldKeyword);
+          setCurrentKeyword(removeQuotes(id.split("_")[1]));
           setTimeout(() => setShowHoverCard(true), 800);
         } else {
           setShowHoverCard(false);
@@ -46,6 +45,8 @@ export default function useHoverCard() {
       document.removeEventListener("mousemove", handleMouseMoveDebounced);
   }, []);
 
+
+
   return {
     isVisible:
       showHoverCard && hoverCardPosition.y !== 0 && hoverCardPosition.x !== 0,
@@ -53,7 +54,7 @@ export default function useHoverCard() {
     left: hoverCardPosition.x,
     content: (
       <>
-        <b>{currentKeyword}:</b> {JSON_LD_KEYWORD_DESCRIPTIONS[currentKeyword]}
+        <b>{currentKeyword}:</b> {hoverCards[currentKeyword] || ""}
       </>
     ),
   };

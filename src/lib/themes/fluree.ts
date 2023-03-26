@@ -2,13 +2,13 @@ import { Theme } from "./types";
 
 export const flureeLightTheme: Theme = {
   defaultTextColor: "#333333",
-  backgroundColor: "#FFFFFF",
+  backgroundColor: "#F7F7F7",
   caretColor: "#5A5A5A",
   lineNumberColor: "#888888",
-  highlightColor: "#D4E4EF",
+  highlightColor: "#FFF8DC",
   tokenColors: {
     Keyword: "#0070AF",
-    String: "#A93332",
+    String: "#333333",
     Numeric: "#00518C",
     Punctuation: "#5A5A5A",
     Invalid: "#FF4242",

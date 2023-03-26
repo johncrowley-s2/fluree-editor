@@ -26,24 +26,16 @@ function App() {
     setValue((prev) => (language.prettify ? language.prettify(prev) : prev));
   }
 
-  function getSuggestions(
-    tokens: Token[],
-    currentTokenIndex: number,
-    position: number
-  ) {
-    const currentToken = tokens[currentTokenIndex];
-    if (!currentToken) return [];
-    const value = currentToken.value;
-    if (/\W+/.test(value)) return [];
-    const matches =  fuzzySearch(value, testSuggestions).slice(0, 5);
-    if (matches.some(m => m === value)) return [];
-    return matches;
-  }
-
   return (
     <ThemeProvider>
-      <div style={{ display: "flex", alignItems: "baseline" }}>
-        <h2>Johnaco Editor </h2>&nbsp;
+      <div
+        style={{
+          display: "flex",
+          alignItems: "baseline",
+          padding: "1.5rem 3rem 0 3rem",
+        }}
+      >
+        <h2>Johnaco Editor </h2>&nbsp;&nbsp;
         <a
           href="https://github.com/johncrowley-s2/johnaco-editor"
           target="_blank"
@@ -53,10 +45,8 @@ function App() {
       </div>
       <div
         style={{
-          width: "100%",
-          height: "48rem",
-          border: "1px solid black",
-          borderRadius: "4px",
+          height: "30rem",
+          padding: "1rem 3rem",
         }}
       >
         <Editor
@@ -66,24 +56,25 @@ function App() {
           value={value}
           onValueChange={(x) => setValue(x)}
           showLineNumbers={showLineNumbers}
-          getSuggestions={getSuggestions}
         />
       </div>
-      <Toolbar
-        showLineNumbers={showLineNumbers}
-        setShowLineNumbers={setShowLineNumbers}
-        highlight={highlight}
-        setHighlight={setHighlight}
-        readonly={readonly}
-        setReadonly={setReadonly}
-        language={language}
-        setLanguage={setLanguage}
-        prettify={prettify}
-      />
-      {/* <hr /> */}
-      {/* <Errors numLines={numLines} numTokens={tokens.length} errors={errors} /> */}
-      {/* <hr /> */}
-      <TokenInspector value={value} language={language} />
+      <div style={{ padding: "0 3rem" }}>
+        <Toolbar
+          showLineNumbers={showLineNumbers}
+          setShowLineNumbers={setShowLineNumbers}
+          highlight={highlight}
+          setHighlight={setHighlight}
+          readonly={readonly}
+          setReadonly={setReadonly}
+          language={language}
+          setLanguage={setLanguage}
+          prettify={prettify}
+        />
+        {/* <hr /> */}
+        {/* <Errors numLines={numLines} numTokens={tokens.length} errors={errors} /> */}
+        {/* <hr /> */}
+        <TokenInspector value={value} language={language} />
+      </div>
     </ThemeProvider>
   );
 }

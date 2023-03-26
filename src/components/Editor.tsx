@@ -5,7 +5,9 @@ import { LanguageDefinition } from "../lib/languages/types";
 import renderTokens from "../lib/renderTokens";
 import tokenize, { Token } from "../lib/tokenize";
 import AutoComplete from "./AutoComplete";
+import Checkmark from "./Checkmark";
 import HoverCard from "./HoverCard";
+import XMark from "./XMark";
 
 type ContextType = "property" | "value" | "unknown";
 
@@ -22,11 +24,6 @@ interface Props {
   readonly?: boolean;
   highlight?: boolean;
   language: LanguageDefinition;
-  getSuggestions?: (
-    tokens: Token[],
-    currentTokenIndex: number,
-    caretPosition: number
-  ) => string[];
 }
 
 function findCurrentTokenIndex(
@@ -108,9 +105,8 @@ export default function Editor({
   highlight = true,
   readonly = false,
   language,
-  getSuggestions,
 }: Props) {
-  const [isAutoCompleteVisible, setIsAutoCompleteVisible] = useState(false);
+  const { getSuggestions, getHovercards } = language;
 
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
@@ -138,6 +134,12 @@ export default function Editor({
     return getSuggestions(tokens, currentTokenIndex, caretPosition);
   }, [tokens, currentTokenIndex]);
 
+  const hoverCards = useMemo(() => {
+    if (!getHovercards || !editorRef.current) return {};
+    const caretPosition = editorRef.current.selectionStart;
+    return getHovercards(tokens, currentTokenIndex, caretPosition);
+  }, [tokens, currentTokenIndex]);
+
   function handleEnter(text: string) {
     if (!editorRef.current) return;
     const { value: tokenValue } = tokens[currentTokenIndex];
@@ -148,22 +150,35 @@ export default function Editor({
     onValueChange(newValue);
   }
 
+  const currentToken = tokens[currentTokenIndex];
+
   return (
     <>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}.no-scrollbar::-webkit-scrollbar{display:none;/*SafariandChrome*/}`,
+        }}
+      />
       <div
+        className="no-scrollbar"
         style={{
           height: "100%",
           width: "100%",
           overflow: "scroll",
           backgroundColor: theme.backgroundColor,
           color: theme.defaultTextColor,
+          lineHeight: "1.2rem",
+          border: "1px solid rgba(0,0,0,0)",
+          borderRadius: "1rem",
+          boxShadow: "0 0 6px rgba(0, 0, 0, 0.17)",
+          position: "relative"
         }}
       >
         <div
           style={{
             ...styles.container,
             fontFamily: '"Fira code", "Fira Mono", monospace',
-            fontSize: 12,
+            fontSize: 14,
           }}
         >
           {showLineNumbers ? (
@@ -171,11 +186,11 @@ export default function Editor({
               style={{
                 position: "absolute",
                 fontFamily: "inherit",
+                fontSize: 12,
                 height: "max-content",
                 width: "1.4rem",
                 color: theme.lineNumberColor,
                 userSelect: "none",
-                borderRight: "1px solid " + theme.lineNumberColor,
                 paddingRight: "0.3rem",
                 paddingLeft: "0.3rem",
                 textAlign: "right",
@@ -183,7 +198,15 @@ export default function Editor({
               }}
             >
               {[...Array(numLines)].map((_, i) => (
-                <div key={i} style={{ fontFamily: "inherit" }}>
+                <div
+                  key={i}
+                  style={{
+                    fontFamily: "inherit",
+                    ...(currentToken?.line === i + 1
+                      ? { color: theme.defaultTextColor }
+                      : {}),
+                  }}
+                >
                   {i + 1}
                 </div>
               ))}
@@ -198,7 +221,7 @@ export default function Editor({
             }}
             dangerouslySetInnerHTML={{
               __html: highlight
-                ? renderTokens(tokens, language.tokenMap, theme)
+                ? renderTokens(tokens, language.tokenMap, theme, hoverCards)
                 : value,
             }}
           />
@@ -239,8 +262,39 @@ export default function Editor({
             handleEnter={handleEnter}
           />
         </div>
+        <div
+          style={{
+            position: "sticky",
+            left: 0,
+            bottom: -1,
+            height: "1.7rem",
+            backgroundColor: theme.backgroundColor,
+            padding: "0 0.5rem",
+            fontFamily: "sans-serif",
+            fontSize: "0.7rem",
+          }}
+        >
+          <div
+            style={{
+              height: "100%",
+              borderTop: "1px solid " + theme.defaultTextColor,
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              padding: "0 1rem",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center" }}>
+              <Checkmark size={14} color={theme.defaultTextColor} />
+              &nbsp;0 Errors
+            </div>
+            <div>
+              Ln {currentToken?.line}, Col {currentToken?.column}&nbsp;&nbsp;&nbsp;&nbsp;{language.displayName || ""}
+            </div>
+          </div>
+        </div>
       </div>
-      <HoverCard />
+      {getHovercards ? <HoverCard hoverCards={hoverCards} /> : null}
     </>
   );
 }

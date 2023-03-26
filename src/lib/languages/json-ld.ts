@@ -1,4 +1,8 @@
-import { TokenMap } from "../tokenize";
+import { testSuggestions } from "../../testSuggestions";
+import fuzzySearch from "../fuzzySearch";
+import { Token, TokenMap } from "../tokenize";
+
+export const displayName = "JSON-LD";
 
 export const tokenMap: TokenMap = {
   StringKey: {
@@ -32,4 +36,47 @@ export function prettify(jsonString: string): string {
     console.error("Invalid JSON string:", error);
     return jsonString;
   }
+}
+
+export function getSuggestions(
+  tokens: Token[],
+  currentTokenIndex: number,
+  position: number
+) {
+  const currentToken = tokens[currentTokenIndex];
+  if (!currentToken) return [];
+  const value = currentToken.value;
+  if (/\W+/.test(value)) return [];
+  const matches = fuzzySearch(value, testSuggestions).slice(0, 5);
+  if (matches.some((m) => m === value)) return [];
+  return matches;
+}
+
+export function getHovercards(
+  tokens: Token[],
+  currentTokenIndex: number,
+  position: number
+) {
+  return {
+    "@context":
+      "Specifies the context in which a JSON-LD document is interpreted. It can be used to map terms used in the document to URIs and to provide information about the meaning of terms.",
+    "@id":
+      "Provides a unique identifier for a node in the graph. This can be a URL, a blank node identifier, or a JSON-LD string.",
+    "@type":
+      "Indicates the type of a node in the graph. This can be a URI or a JSON-LD string.",
+    "@value":
+      "Specifies the value of a node in the graph. This can be a literal value or a reference to another node.",
+    "@language":
+      "Indicates the language of a literal value. This can be any valid language tag.",
+    "@index":
+      "Specifies the index value of an element in a collection node. This can be any valid JSON-LD string.",
+    "@reverse":
+      "Indicates that a property is used to express a reverse relationship between nodes. The value of this keyword is another JSON-LD object.",
+    "@nest":
+      "Indicates that a property is used to nest a node within another node. The value of this keyword is another JSON-LD object.",
+    "@prefix":
+      "Provides a prefix that can be used in property names and value strings in a JSON-LD document. The value of this keyword is a string.",
+    "@vocab":
+      "Specifies a default vocabulary that can be used to expand property names in a JSON-LD document.",
+  };
 }

@@ -82,6 +82,7 @@ export function getHovercards(
 }
 
 export function getErrors(
+  value: string,
   tokens: Token[],
   currentTokenIndex: number,
   position: number
@@ -93,5 +94,10 @@ export function getErrors(
         `LexicalError: Invalid token ${t.value} at position ${t.position} (Ln ${t.line}/Col ${t.column})`
       );
   });
+  try {
+    JSON.parse(value);
+  } catch (e: any) {
+    results.push(e.toString());
+  }
   return results;
 }

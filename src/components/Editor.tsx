@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useMemo, useRef, useState } from "react";
 import getCaretCoordinates from "../lib/getCaretCoordinates";
 import useTheme from "../lib/hooks/useTheme";
 import { LanguageDefinition } from "../lib/languages/types";
@@ -108,6 +108,8 @@ export default function Editor({
 }: Props) {
   const { getSuggestions, getHovercards, getErrors } = language;
 
+  const [showErrors, setSHowErrors] = useState(false);
+
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
   const { theme } = useTheme();
@@ -143,8 +145,8 @@ export default function Editor({
   const errors = useMemo(() => {
     if (!getErrors || !editorRef.current) return [];
     const caretPosition = editorRef.current.selectionStart;
-    return getErrors(tokens, currentTokenIndex, caretPosition);
-  }, [tokens, currentTokenIndex]);
+    return getErrors(value, tokens, currentTokenIndex, caretPosition);
+  }, [value, tokens, currentTokenIndex]);
 
   function handleEnter(text: string) {
     if (!editorRef.current) return;
@@ -278,7 +280,7 @@ export default function Editor({
             padding: "0 0.5rem",
             fontFamily: "sans-serif",
             fontSize: "0.7rem",
-            userSelect: "none"
+            userSelect: "none",
           }}
         >
           <div
@@ -291,13 +293,24 @@ export default function Editor({
               padding: "0 1rem",
             }}
           >
-            <div style={{ display: "flex", alignItems: "center" }}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                ...(errors.length > 0 ? { cursor: "pointer" } : {}),
+              }}
+              onClick={() => setSHowErrors(!showErrors)}
+              {...(errors.length > 0 ? { title: "See Errors" } : {})}
+            >
               {errors.length > 0 ? (
-                <XMark size={14} color={theme.defaultTextColor} />
+                <XMark size={14} color={theme.tokenColors.Invalid} />
               ) : (
                 <Checkmark size={14} color={theme.defaultTextColor} />
               )}
-              &nbsp;{errors.length} Errors
+              &nbsp;{errors.length} Errors &nbsp;
+              {errors.length > 0 ? (
+                <span style={{ color: theme.lineNumberColor }}> &#9650;</span>
+              ) : null}
             </div>
             <div>
               Ln {currentToken?.line}, Col {currentToken?.column}
@@ -305,6 +318,25 @@ export default function Editor({
             </div>
           </div>
         </div>
+        {showErrors && errors.length > 0 ? (
+          <div
+            style={{
+              position: "sticky",
+              backgroundColor: theme.backgroundColor,
+              left: 16,
+              bottom: 24,
+              border: "1px solid" + theme.defaultTextColor,
+              borderRadius: 4,
+              padding: "1rem",
+            }}
+          >
+            <ul style={{ listStyle: "none" }}>
+              {errors.map((e) => (
+                <li>{e}</li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
       </div>
       {getHovercards ? <HoverCard hoverCards={hoverCards} /> : null}
     </>

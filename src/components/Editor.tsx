@@ -20,6 +20,7 @@ interface Props {
   onValueChange: (s: string) => void;
   showLineNumbers: boolean;
   readonly?: boolean;
+  highlight?: boolean;
   language: LanguageDefinition;
   getSuggestions?: (
     tokens: Token[],
@@ -104,6 +105,7 @@ export default function Editor({
   value,
   onValueChange,
   showLineNumbers,
+  highlight = true,
   readonly = false,
   language,
   getSuggestions,
@@ -195,7 +197,9 @@ export default function Editor({
               paddingLeft: "0.6rem",
             }}
             dangerouslySetInnerHTML={{
-              __html: renderTokens(tokens, language.tokenMap, theme),
+              __html: highlight
+                ? renderTokens(tokens, language.tokenMap, theme)
+                : value,
             }}
           />
           {!readonly && (

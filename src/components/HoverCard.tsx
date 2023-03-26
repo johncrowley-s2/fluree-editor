@@ -15,11 +15,11 @@ export default function HoverCard() {
         position: "fixed",
         top: top,
         left: left,
-        padding: "1rem",
+        padding: "0.5rem",
         backgroundColor: theme.backgroundColor,
         color: theme.defaultTextColor,
         border: `1px solid ${theme.defaultTextColor}`,
-        fontSize: 14,
+        fontSize: 12,
         fontFamily: "sans-serif",
       }}
     >

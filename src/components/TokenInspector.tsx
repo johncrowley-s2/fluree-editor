@@ -7,15 +7,6 @@ interface Props {
   language: LanguageDefinition;
 }
 
-// function useFilter(tokens: Token[]) {
-//   const types = useMemo(() => tokens.reduce<string[]>((acc, curr) => {
-//     if (!acc.includes(curr.type)) return acc;
-//     return [...acc, curr.type];
-//   }, []), [tokens]);
-
-//   const [filters, setFilters] =
-// }
-
 export default function TokenInspector({ value, language }: Props) {
   const [showTokens, setShowTokens] = useState(false); // Default false bc rendering the token table slows down the UI considerably
   const [filterType, setFilterType] = useState<string>("none");
@@ -91,7 +82,7 @@ export default function TokenInspector({ value, language }: Props) {
               </table>
             </>
           ) : (
-            "Open to inspect tokens."
+            "^Open to inspect tokens."
           )}
         </div>
       </div>

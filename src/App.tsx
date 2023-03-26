@@ -61,6 +61,7 @@ function App() {
       >
         <Editor
           readonly={readonly}
+          highlight={highlight}
           language={language}
           value={value}
           onValueChange={(x) => setValue(x)}

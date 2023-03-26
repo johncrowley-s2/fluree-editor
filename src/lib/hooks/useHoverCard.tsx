@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { debounce } from "../debounce";
 import { JldKeyword, JSON_LD_KEYWORD_DESCRIPTIONS } from "../jsonLd";
+import { removeQuotes } from "../removeQuotes";
 
 export default function useHoverCard() {
   const [hoverCardPosition, setHoverCardPosition] = useState({ x: 0, y: 0 });
@@ -31,7 +32,7 @@ export default function useHoverCard() {
         const id = elems[index];
         const elem = document.getElementById(id);
         if (elem && ids.includes(id)) {
-          setCurrentKeyword(id.split("_")[1] as JldKeyword);
+          setCurrentKeyword(removeQuotes(id.split("_")[1]) as JldKeyword);
           setTimeout(() => setShowHoverCard(true), 800);
         } else {
           setShowHoverCard(false);

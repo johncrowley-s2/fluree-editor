@@ -91,7 +91,7 @@ export function getErrors(
   tokens.forEach((t) => {
     if (t.type === "Invalid")
       results.push(
-        `LexicalError: Invalid token ${t.value} at position ${t.position} (Ln ${t.line}/Col ${t.column})`
+        `LexicalError: Invalid token \`${t.value}\` at position ${t.position} (Ln ${t.line}/Col ${t.column})`
       );
   });
   try {

@@ -118,12 +118,6 @@ export default function Editor({
   const tokens = useMemo(() => tokenize(value, language.tokenMap), [value]);
   const numLines = useMemo(() => value.split("\n").length, [value]);
 
-  const flashAutocomplete = debounce(() => {
-    if (isAutoCompleteVisible) return;
-    setIsAutoCompleteVisible(true);
-    setTimeout(() => setIsAutoCompleteVisible(false), 3000);
-  }, 200);
-
   const { top, left } = useMemo(() => {
     if (editorRef.current) {
       return getCaretCoordinates(editorRef.current);
@@ -142,6 +136,16 @@ export default function Editor({
     const caretPosition = editorRef.current.selectionStart;
     return getSuggestions(tokens, currentTokenIndex, caretPosition);
   }, [tokens, currentTokenIndex]);
+
+  function handleEnter(text: string) {
+    if (!editorRef.current) return;
+    const { value: tokenValue } = tokens[currentTokenIndex];
+    const newValue =
+      value.slice(0, editorRef.current.selectionStart - tokenValue.length) +
+      text +
+      value.slice(editorRef.current.selectionStart);
+    onValueChange(newValue);
+  }
 
   return (
     <>
@@ -224,11 +228,13 @@ export default function Editor({
               }}
             />
           )}
-          <AutoComplete isVisible={suggestions.length > 0} top={top} left={left}>
-            {suggestions.map((s) => (
-              <div key={s}>{s}</div>
-            ))}
-          </AutoComplete>
+          <AutoComplete
+            isVisible={suggestions.length > 0}
+            top={top}
+            left={left}
+            suggestions={suggestions}
+            handleEnter={handleEnter}
+          />
         </div>
       </div>
       <HoverCard />

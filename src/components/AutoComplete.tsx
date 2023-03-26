@@ -1,42 +1,86 @@
-import { ReactNode } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import useTheme from "../lib/hooks/useTheme";
+
+function incrementIndex(currentIndex: number, arrayLength: number) {
+  return (currentIndex + 1) % arrayLength;
+}
+
+function decrementIndex(currentIndex: number, arrayLength: number) {
+  return (currentIndex - 1 + arrayLength) % arrayLength;
+}
 
 interface Props {
   isVisible: boolean;
   top: number;
   left: number;
-  children: ReactNode;
+  suggestions: string[];
+  handleEnter: (text: string) => void;
 }
 
 export default function AutoComplete({
   isVisible,
   top,
   left,
-  children,
+  suggestions,
+  handleEnter,
 }: Props) {
+  const [activeIndex, setActiveIndex] = useState(0);
   const { theme } = useTheme();
 
+  useEffect(() => {
+    if (!isVisible) return;
+    function handleKeydown(e: KeyboardEvent) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIndex((prev) => incrementIndex(prev, suggestions.length));
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIndex((prev) => decrementIndex(prev, suggestions.length));
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        setActiveIndex(0);
+        handleEnter(suggestions[activeIndex]);
+      }
+    }
+
+    document.addEventListener("keydown", handleKeydown);
+    return () => document.removeEventListener("keydown", handleKeydown);
+  }, [suggestions, activeIndex]);
+
+  if (!isVisible) return null;
   return (
     <>
-      {isVisible ? (
-        <div
-          id="autocomplete"
-          style={{
-            maxWidth: "16rem",
-            position: "absolute",
-            top: top,
-            left: left,
-            padding: "0.3rem",
-            backgroundColor: theme.backgroundColor,
-            color: theme.defaultTextColor,
-            border: `1px solid ${theme.defaultTextColor}`,
-            fontSize: 12,
-            fontFamily: "sans-serif",
-          }}
-        >
-          {children}
-        </div>
-      ) : null}
+      <div
+        id="autocomplete"
+        style={{
+          maxWidth: "16rem",
+          position: "absolute",
+          top: top,
+          left: left,
+          padding: "0.3rem",
+          backgroundColor: theme.backgroundColor,
+          color: theme.defaultTextColor,
+          border: `1px solid ${theme.defaultTextColor}`,
+          fontSize: 12,
+          fontFamily: "sans-serif",
+        }}
+      >
+        {suggestions.map((s, i) => (
+          <div
+            key={s}
+            style={{
+              userSelect: "none",
+              ...(activeIndex === i
+                ? { backgroundColor: theme.highlightColor }
+                : {}),
+            }}
+            onMouseEnter={() => setActiveIndex(i)}
+            onClick={() => handleEnter(suggestions[i])}
+          >
+            {s}
+          </div>
+        ))}
+      </div>
     </>
   );
 }

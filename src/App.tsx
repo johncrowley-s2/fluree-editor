@@ -35,8 +35,9 @@ function App() {
     if (!currentToken) return [];
     const value = currentToken.value;
     if (/\W+/.test(value)) return [];
-    console.log("VALUE: ", value);
-    return fuzzySearch(value, testSuggestions).slice(0, 5);
+    const matches =  fuzzySearch(value, testSuggestions).slice(0, 5);
+    if (matches.some(m => m === value)) return [];
+    return matches;
   }
 
   return (

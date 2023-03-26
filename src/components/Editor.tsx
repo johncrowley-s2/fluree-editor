@@ -185,7 +185,7 @@ export default function Editor({
         <div
           style={{
             ...styles.container,
-            fontFamily: '"Fira code", "Fira Mono", monospace',
+            fontFamily: '"Source Code Pro", "Fira Mono", monospace',
             fontSize: 14,
           }}
         >

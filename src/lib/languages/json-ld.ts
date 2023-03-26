@@ -80,3 +80,18 @@ export function getHovercards(
       "Specifies a default vocabulary that can be used to expand property names in a JSON-LD document.",
   };
 }
+
+export function getErrors(
+  tokens: Token[],
+  currentTokenIndex: number,
+  position: number
+) {
+  let results: string[] = [];
+  tokens.forEach((t) => {
+    if (t.type === "Invalid")
+      results.push(
+        `LexicalError: Invalid token ${t.value} at position ${t.position} (Ln ${t.line}/Col ${t.column})`
+      );
+  });
+  return results;
+}

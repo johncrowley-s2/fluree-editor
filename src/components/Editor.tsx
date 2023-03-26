@@ -7,6 +7,7 @@ import tokenize, { Token } from "../lib/tokenize";
 import AutoComplete from "./AutoComplete";
 import Checkmark from "./Checkmark";
 import HoverCard from "./HoverCard";
+import XMark from "./XMark";
 
 type ContextType = "property" | "value" | "unknown";
 
@@ -105,7 +106,7 @@ export default function Editor({
   readonly = false,
   language,
 }: Props) {
-  const { getSuggestions, getHovercards } = language;
+  const { getSuggestions, getHovercards, getErrors } = language;
 
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
@@ -139,6 +140,12 @@ export default function Editor({
     return getHovercards(tokens, currentTokenIndex, caretPosition);
   }, [tokens, currentTokenIndex]);
 
+  const errors = useMemo(() => {
+    if (!getErrors || !editorRef.current) return [];
+    const caretPosition = editorRef.current.selectionStart;
+    return getErrors(tokens, currentTokenIndex, caretPosition);
+  }, [tokens, currentTokenIndex]);
+
   function handleEnter(text: string) {
     if (!editorRef.current) return;
     const { value: tokenValue } = tokens[currentTokenIndex];
@@ -170,7 +177,7 @@ export default function Editor({
           border: "1px solid rgba(0,0,0,0)",
           borderRadius: "1rem",
           boxShadow: "0 0 6px rgba(0, 0, 0, 0.17)",
-          position: "relative"
+          position: "relative",
         }}
       >
         <div
@@ -271,6 +278,7 @@ export default function Editor({
             padding: "0 0.5rem",
             fontFamily: "sans-serif",
             fontSize: "0.7rem",
+            userSelect: "none"
           }}
         >
           <div
@@ -284,11 +292,16 @@ export default function Editor({
             }}
           >
             <div style={{ display: "flex", alignItems: "center" }}>
-              <Checkmark size={14} color={theme.defaultTextColor} />
-              &nbsp;0 Errors
+              {errors.length > 0 ? (
+                <XMark size={14} color={theme.defaultTextColor} />
+              ) : (
+                <Checkmark size={14} color={theme.defaultTextColor} />
+              )}
+              &nbsp;{errors.length} Errors
             </div>
             <div>
-              Ln {currentToken?.line}, Col {currentToken?.column}&nbsp;&nbsp;&nbsp;&nbsp;{language.displayName || ""}
+              Ln {currentToken?.line}, Col {currentToken?.column}
+              &nbsp;&nbsp;&nbsp;&nbsp;{language.displayName || ""}
             </div>
           </div>
         </div>

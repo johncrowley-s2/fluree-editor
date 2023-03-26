@@ -14,4 +14,9 @@ export interface LanguageDefinition {
     currentTokenIndex: number,
     position: number
   ) => Record<string, string>;
+  getErrors?: (
+    tokens: Token[],
+    currentTokenIndex: number,
+    position: number
+  ) => string[];
 }

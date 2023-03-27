@@ -23,7 +23,7 @@ export default function StatusBar({ theme, errors, tokens, language }: Props) {
   const [currentLine, currentColumn] = useMemo(() => {
     const currentTokenIndex = findCurrentTokenIndex(tokens, selectionStart);
     const currentToken = tokens[currentTokenIndex];
-    if (!currentToken) return [0, 0];
+    if (!currentToken) return [1, 1];
     const difference = selectionStart - currentToken.position;
     return [currentToken.line, currentToken.column + difference];
   }, [tokens, selectionStart]);

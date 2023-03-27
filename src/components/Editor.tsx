@@ -2,20 +2,12 @@ import { useMemo, useRef, useState } from "react";
 import getCaretCoordinates from "../lib/getCaretCoordinates";
 import useTheme from "../lib/hooks/useTheme";
 import { LanguageDefinition } from "../lib/languages/types";
-import renderTokens from "../lib/renderTokens";
+import { renderTokensJsx as renderTokens } from "../lib/renderTokensJsx";
 import tokenize, { Token } from "../lib/tokenize";
 import AutoComplete from "./AutoComplete";
 import Checkmark from "./Checkmark";
 import HoverCard from "./HoverCard";
 import XMark from "./XMark";
-
-type ContextType = "property" | "value" | "unknown";
-
-interface Context {
-  type: ContextType;
-  key?: string;
-  contextObj?: Record<string, any>;
-}
 
 interface Props {
   value: string;
@@ -48,55 +40,6 @@ function findCurrentTokenIndex(
 
   return currentTokenIndex;
 }
-
-// function getContext(tokens: Token[], cursorPosition: number): Context {
-//   const currentToken = findCurrentToken(tokens, cursorPosition);
-//   console.log("CURRENT TOKEN: ", currentToken);
-//   if (!currentToken) {
-//     return { type: "unknown" };
-//   }
-
-//   let key: string | undefined;
-//   let contextObj: Record<string, any> | undefined;
-
-//   switch (currentToken.type) {
-//     case "StringKey":
-//       return { type: "property", key: currentToken.value, contextObj };
-
-//     case "StringValue":
-//     case "Number":
-//     case "Boolean":
-//     case "Null":
-//       // Find the corresponding key
-//       for (let i = tokens.indexOf(currentToken) - 1; i >= 0; i--) {
-//         if (tokens[i].type === "StringKey") {
-//           key = tokens[i].value;
-//           break;
-//         }
-//       }
-
-//       // Find the "@context" object
-//       for (let i = 0; i < tokens.length; i++) {
-//         if (
-//           tokens[i].type === "StringKey" &&
-//           tokens[i].value === '"@context"'
-//         ) {
-//           try {
-//             const contextStr = tokens[i + 2]?.value;
-//             contextObj = contextStr ? JSON.parse(contextStr) : undefined;
-//           } catch (err) {
-//             // Invalid JSON in the "@context" value
-//           }
-//           break;
-//         }
-//       }
-
-//       return { type: "value", key, contextObj };
-
-//     default:
-//       return { type: "unknown" };
-//   }
-// }
 
 export default function Editor({
   value,
@@ -227,12 +170,11 @@ export default function Editor({
               marginLeft: showLineNumbers ? "2rem" : 0,
               paddingLeft: "0.6rem",
             }}
-            dangerouslySetInnerHTML={{
-              __html: highlight
-                ? renderTokens(tokens, language.tokenMap, theme, hoverCards)
-                : value,
-            }}
-          />
+          >
+            {highlight
+              ? renderTokens(tokens, language.tokenMap, theme, hoverCards)
+              : value}
+          </pre>
           {!readonly && (
             <textarea
               ref={editorRef}

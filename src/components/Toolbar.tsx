@@ -14,6 +14,8 @@ interface Props {
   language: LanguageDefinition;
   setLanguage: Dispatch<SetStateAction<LanguageDefinition>>;
   prettify: () => void;
+  showStatusBar: boolean;
+  setShowStatusBar: Dispatch<SetStateAction<boolean>>;
 }
 
 export default function Toolbar({
@@ -26,6 +28,8 @@ export default function Toolbar({
   language,
   setLanguage,
   prettify,
+  showStatusBar,
+  setShowStatusBar,
 }: Props) {
   const { handleChangeTheme } = useTheme();
 
@@ -51,6 +55,16 @@ export default function Toolbar({
         <option value="json-ld">JSON-LD</option>
         <option value="sql">SQL</option>
       </select>
+      &nbsp;
+      <input
+        type="checkbox"
+        id="statusBar"
+        name="statusBar"
+        value="statusBar"
+        checked={showStatusBar}
+        onChange={(e) => setShowStatusBar(e.target.checked)}
+      />
+      <label htmlFor="lineNums"> Status Bar</label>
       &nbsp;
       <input
         type="checkbox"

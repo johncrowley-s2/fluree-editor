@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import findCurrentTokenIndex from "../lib/findCurrentTokenIndex";
 import getCaretCoordinates from "../lib/getCaretCoordinates";
 import useTheme from "../lib/hooks/useTheme";
 import { LanguageDefinition } from "../lib/languages/types";
@@ -7,51 +8,29 @@ import tokenize, { Token } from "../lib/tokenize";
 import AutoComplete from "./AutoComplete";
 import Checkmark from "./Checkmark";
 import HoverCard from "./HoverCard";
+import StatusBar from "./StatusBar";
 import XMark from "./XMark";
 
 interface Props {
   value: string;
   onValueChange: (s: string) => void;
   showLineNumbers: boolean;
+  showStatusBar: boolean;
   readonly?: boolean;
   highlight?: boolean;
   language: LanguageDefinition;
-}
-
-function findCurrentTokenIndex(
-  tokens: Token[],
-  cursorPosition: number
-): number {
-  let currentTokenIndex = 0;
-
-  for (let i = 0; i < tokens.length; i++) {
-    const token = tokens[i];
-    if (token.position < cursorPosition) {
-      if (
-        currentTokenIndex === null ||
-        token.position > tokens[currentTokenIndex].position
-      ) {
-        currentTokenIndex = i;
-      }
-    } else {
-      break;
-    }
-  }
-
-  return currentTokenIndex;
 }
 
 export default function Editor({
   value,
   onValueChange,
   showLineNumbers,
+  showStatusBar,
   highlight = true,
   readonly = false,
   language,
 }: Props) {
   const { getSuggestions, getHovercards, getErrors } = language;
-
-  const [showErrors, setSHowErrors] = useState(false);
 
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
@@ -107,10 +86,11 @@ export default function Editor({
     <>
       <style
         dangerouslySetInnerHTML={{
-          __html: `.no-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}.no-scrollbar::-webkit-scrollbar{display:none;/*SafariandChrome*/}`,
+          __html: `.no-scrollbar{overflow:auto;-ms-overflow-style:none;scrollbar-width:none;}.no-scrollbar::-webkit-scrollbar{display:none;}`,
         }}
       />
       <div
+        id="editorContainer"
         className="no-scrollbar"
         style={{
           height: "100%",
@@ -177,6 +157,7 @@ export default function Editor({
           </pre>
           {!readonly && (
             <textarea
+              id="textarea"
               ref={editorRef}
               rows={numLines}
               cols={100}
@@ -193,8 +174,8 @@ export default function Editor({
               onKeyDown={(e) => {
                 if (e.key == "Tab" && e.target instanceof HTMLTextAreaElement) {
                   e.preventDefault();
-                  var start = e.target.selectionStart;
-                  var end = e.target.selectionEnd;
+                  const start = e.target.selectionStart;
+                  const end = e.target.selectionEnd;
                   e.target.value =
                     e.target.value.substring(0, start) +
                     "\t" +
@@ -212,72 +193,13 @@ export default function Editor({
             handleEnter={handleEnter}
           />
         </div>
-        <div
-          style={{
-            position: "sticky",
-            left: 0,
-            bottom: -1,
-            height: "1.7rem",
-            backgroundColor: theme.backgroundColor,
-            padding: "0 0.5rem",
-            fontFamily: "sans-serif",
-            fontSize: "0.7rem",
-            userSelect: "none",
-          }}
-        >
-          <div
-            style={{
-              height: "100%",
-              borderTop: "1px solid " + theme.defaultTextColor,
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              padding: "0 1rem",
-            }}
-          >
-            <div
-              style={{
-                display: "flex",
-                alignItems: "center",
-                ...(errors.length > 0 ? { cursor: "pointer" } : {}),
-              }}
-              onClick={() => setSHowErrors(!showErrors)}
-              {...(errors.length > 0 ? { title: "See Errors" } : {})}
-            >
-              {errors.length > 0 ? (
-                <XMark size={14} color={theme.tokenColors.Invalid} />
-              ) : (
-                <Checkmark size={14} color={theme.defaultTextColor} />
-              )}
-              &nbsp;{errors.length} Errors &nbsp;
-              {errors.length > 0 ? (
-                <span style={{ color: theme.lineNumberColor }}> &#9650;</span>
-              ) : null}
-            </div>
-            <div>
-              Ln {currentToken?.line}, Col {currentToken?.column}
-              &nbsp;&nbsp;&nbsp;&nbsp;{language.displayName || ""}
-            </div>
-          </div>
-        </div>
-        {showErrors && errors.length > 0 ? (
-          <div
-            style={{
-              position: "sticky",
-              backgroundColor: theme.backgroundColor,
-              left: 16,
-              bottom: 24,
-              border: "1px solid" + theme.defaultTextColor,
-              borderRadius: 4,
-              padding: "1rem",
-            }}
-          >
-            <ul style={{ listStyle: "none" }}>
-              {errors.map((e) => (
-                <li>{e}</li>
-              ))}
-            </ul>
-          </div>
+        {showStatusBar ? (
+          <StatusBar
+            theme={theme}
+            errors={errors}
+            tokens={tokens}
+            language={language}
+          />
         ) : null}
       </div>
       {getHovercards ? <HoverCard hoverCards={hoverCards} /> : null}

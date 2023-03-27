@@ -13,6 +13,7 @@ function App() {
   const [highlight, setHighlight] = useState(true);
   const [readonly, setReadonly] = useState(false);
   const [language, setLanguage] = useState<LanguageDefinition>(jsonLd);
+  const [showStatusBar, setShowStatusBar] = useState(true);
 
   useEffect(() => {
     if (language === jsonLd) setValue(jld);
@@ -20,7 +21,9 @@ function App() {
   }, [language]);
 
   function prettify() {
-    setValue((prev) => (language.prettify ? language.prettify(prev) : prev));
+    if (!language.prettify) return;
+    console.log("ORIG: ", value, "PRETTY: ", language.prettify(value));
+    setValue(language.prettify(value));
   }
 
   return (
@@ -54,6 +57,7 @@ function App() {
             value={value}
             onValueChange={(x) => setValue(x)}
             showLineNumbers={showLineNumbers}
+            showStatusBar={showStatusBar}
           />
         </div>
         <div style={{ padding: "0 3rem" }}>
@@ -67,10 +71,9 @@ function App() {
             language={language}
             setLanguage={setLanguage}
             prettify={prettify}
+            showStatusBar={showStatusBar}
+            setShowStatusBar={setShowStatusBar}
           />
-          {/* <hr /> */}
-          {/* <Errors numLines={numLines} numTokens={tokens.length} errors={errors} /> */}
-          {/* <hr /> */}
           <TokenInspector value={value} language={language} />
         </div>
       </ThemeProvider>

@@ -10,8 +10,9 @@ This code is in the very early stages of development so everything can and most 
 
 
 ## TODO:
+- Write good docs.
 - Write plenty of unit tests.
-- Finish autocomplete. Make it easily customizable.
-- Finish hover card. Make it also easily customizable.
-- Horizontal scroll. Wtf??
+- Figure what to do about the handleEnter() function.
+- Animations? maybe...or not.
 - Find a way to only render the visible text in the viewport to improve performance for large documents.
+- Other optimizations (throttling/debouncing functions, memoization, etc...).

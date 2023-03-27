@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export default function useTextareaSelectionStart(textareaId: string) {
   const [selectionStart, setSelectionStart] = useState(0);

@@ -1,40 +1,58 @@
 import { useMemo, useRef } from "react";
-import findCurrentTokenIndex from "../lib/findCurrentTokenIndex";
-import getCaretCoordinates from "../lib/getCaretCoordinates";
-import useTheme from "../lib/hooks/useTheme";
-import { LanguageDefinition } from "../lib/languages/types";
-import { renderTokensJsx as renderTokens } from "../lib/renderTokensJsx";
-import tokenize from "../lib/tokenize";
+import { LanguageDefinition, Theme } from "../..";
+import * as jsonLd from "../../languages/json-ld";
+import * as sql from "../../languages/sql";
+import { flureeDarkTheme, flureeLightTheme } from "../../themes/fluree";
+import { renderTokensJsx as renderTokens } from "../renderTokensJsx"; // Change to renderTokensHtml fro HTML rendering
+import tokenize from "../tokenize";
+import findCurrentTokenIndex from "../utils/findCurrentTokenIndex";
+import getCaretCoordinates from "../utils/getCaretCoordinates";
 import AutoComplete from "./AutoComplete";
 import HoverCard from "./HoverCard";
 import StatusBar from "./StatusBar";
 
+const languageMap: Record<string, LanguageDefinition> = {
+  "json-ld": jsonLd,
+  sql: sql,
+};
+
+const themeMap: Record<string, Theme> = {
+  light: flureeLightTheme,
+  dark: flureeDarkTheme,
+};
+
 interface Props {
   value: string;
   onValueChange: (s: string) => void;
-  showLineNumbers: boolean;
-  showStatusBar: boolean;
+  showLineNumbers?: boolean;
+  showStatusBar?: boolean;
   readonly?: boolean;
   highlight?: boolean;
-  language: LanguageDefinition;
+  language?: string;
+  theme?: string;
+  fontSize?: number;
 }
 
 export default function Editor({
   value,
   onValueChange,
-  showLineNumbers,
-  showStatusBar,
+  showLineNumbers = true,
+  showStatusBar = true,
   highlight = true,
   readonly = false,
-  language,
+  language = "json-ld",
+  theme: themeKey = "light",
+  fontSize = 14,
 }: Props) {
-  const { getSuggestions, getHovercards, getErrors } = language;
+  const lang: LanguageDefinition = languageMap[language] || jsonLd;
+  const { displayName, tokenMap, getSuggestions, getHovercards, getErrors } =
+    lang;
+
+  const theme = themeMap[themeKey];
 
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
-  const { theme } = useTheme();
-
-  const tokens = useMemo(() => tokenize(value, language.tokenMap), [value]);
+  const tokens = useMemo(() => tokenize(value, tokenMap), [value]);
   const numLines = useMemo(() => value.split("\n").length, [value]);
 
   const { top, left } = useMemo(() => {
@@ -51,34 +69,44 @@ export default function Editor({
   }, [tokens]);
 
   const suggestions = useMemo(() => {
-    if (!getSuggestions || !editorRef.current) return [];
-    const caretPosition = editorRef.current.selectionStart;
+    if (!getSuggestions) return [];
+    const caretPosition = editorRef.current?.selectionStart || 0;
     return getSuggestions(tokens, currentTokenIndex, caretPosition);
   }, [tokens, currentTokenIndex]);
 
   const hoverCards = useMemo(() => {
-    if (!getHovercards || !editorRef.current) return {};
-    const caretPosition = editorRef.current.selectionStart;
+    if (!getHovercards) return {};
+    const caretPosition = editorRef.current?.selectionStart || 0;
     return getHovercards(tokens, currentTokenIndex, caretPosition);
   }, [tokens, currentTokenIndex]);
 
   const errors = useMemo(() => {
-    if (!getErrors || !editorRef.current) return [];
-    const caretPosition = editorRef.current.selectionStart;
+    if (!getErrors) return [];
+    const caretPosition = editorRef.current?.selectionStart || 0;
     return getErrors(value, tokens, currentTokenIndex, caretPosition);
   }, [value, tokens, currentTokenIndex]);
 
+  // TODO: This logic probably needs to be more language-agnostic or else
+  // moved to be with the language definition.
   function handleEnter(text: string) {
     if (!editorRef.current) return;
     const { value: tokenValue } = tokens[currentTokenIndex];
+    let start = editorRef.current.selectionStart - tokenValue.length;
+    if (tokenValue[0] === '"') start++;
     const newValue =
-      value.slice(0, editorRef.current.selectionStart - tokenValue.length) +
+      value.slice(0, start) +
       text +
+      (tokenValue[0] === '"' ? '"' : "") +
       value.slice(editorRef.current.selectionStart);
     onValueChange(newValue);
   }
 
   const currentToken = tokens[currentTokenIndex];
+
+  const additionalEditorStyles = {
+    marginLeft: showLineNumbers ? fontSize * 1.2 : 0,
+    paddingLeft: fontSize * 0.8,
+  };
 
   return (
     <>
@@ -94,12 +122,12 @@ export default function Editor({
           width: "100%",
           backgroundColor: theme.backgroundColor,
           color: theme.defaultTextColor,
-          lineHeight: "1.2rem",
+          lineHeight: fontSize * 1.5 + "px",
           border: "1px solid rgba(0,0,0,0)",
-          borderRadius: "1rem",
-          boxShadow: "0 0 6px rgba(0, 0, 0, 0.17)",
-          padding: "1rem",
-          paddingBottom: "1.7rem",
+          borderRadius: 8,
+          boxShadow: "0 0 6px rgba(0, 0, 0, 0.1)",
+          padding: fontSize,
+          paddingBottom: showStatusBar ? fontSize * 1.5 : fontSize,
           boxSizing: "border-box",
           position: "relative",
           overflow: "visible",
@@ -118,7 +146,7 @@ export default function Editor({
             style={{
               ...styles.container,
               fontFamily: '"Source Code Pro", "Fira Mono", monospace',
-              fontSize: 14,
+              fontSize: fontSize,
             }}
           >
             {showLineNumbers ? (
@@ -126,15 +154,13 @@ export default function Editor({
                 style={{
                   position: "absolute",
                   fontFamily: "inherit",
-                  fontSize: 12,
+                  fontSize: fontSize * 0.8,
                   height: "max-content",
-                  width: "1.4rem",
+                  width: fontSize * 1.2,
                   color: theme.lineNumberColor,
                   userSelect: "none",
-                  paddingRight: "0.3rem",
-                  paddingLeft: "0.3rem",
                   textAlign: "right",
-                  padding: "0.7rem 0.3rem",
+                  padding: 0,
                 }}
               >
                 {[...Array(numLines)].map((_, i) => (
@@ -155,13 +181,12 @@ export default function Editor({
             <pre
               style={{
                 ...styles.editor,
+                ...additionalEditorStyles,
                 ...styles.highlight,
-                marginLeft: showLineNumbers ? "2rem" : 0,
-                paddingLeft: "0.6rem",
               }}
             >
               {highlight
-                ? renderTokens(tokens, language.tokenMap, theme, hoverCards)
+                ? renderTokens(tokens, tokenMap, theme, hoverCards)
                 : value}
             </pre>
             {!readonly && (
@@ -173,9 +198,8 @@ export default function Editor({
                 wrap="off"
                 style={{
                   ...styles.editor,
+                  ...additionalEditorStyles,
                   ...styles.textarea,
-                  marginLeft: showLineNumbers ? "2rem" : 0,
-                  paddingLeft: "0.6rem",
                 }}
                 value={value}
                 onChange={(e) => onValueChange(e.target.value)}
@@ -203,6 +227,8 @@ export default function Editor({
               left={left}
               suggestions={suggestions}
               handleEnter={handleEnter}
+              backgroundColor={theme.backgroundColor}
+              textColor={theme.defaultTextColor}
             />
           </div>
         </div>
@@ -211,11 +237,19 @@ export default function Editor({
             theme={theme}
             errors={errors}
             tokens={tokens}
-            language={language}
+            languageName={displayName}
+            fontSize={fontSize * 0.8}
           />
         ) : null}
       </div>
-      {getHovercards ? <HoverCard hoverCards={hoverCards} /> : null}
+      {getHovercards ? (
+        <HoverCard
+          hoverCards={hoverCards}
+          backgroundColor={theme.backgroundColor}
+          textColor={theme.defaultTextColor}
+          fontSize={fontSize}
+        />
+      ) : null}
     </>
   );
 }
@@ -255,12 +289,12 @@ const styles = {
     fontWeight: "inherit",
     letterSpacing: "inherit",
     lineHeight: "inherit",
-    padding: "0.7rem 0.3rem",
     tabSize: "inherit",
     textIndent: "inherit",
     textRendering: "inherit",
     textTransform: "inherit",
     whiteSpace: "pre",
     overflowWrap: "normal",
+    padding: 0,
   },
 } as const;

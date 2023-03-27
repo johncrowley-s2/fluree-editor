@@ -1,4 +1,4 @@
-import { Token } from "./tokenize";
+import { Token } from "../..";
 
 export default function findCurrentTokenIndex(
   tokens: Token[],

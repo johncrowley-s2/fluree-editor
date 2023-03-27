@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import useTheme from "../lib/hooks/useTheme";
 
 function incrementIndex(currentIndex: number, arrayLength: number) {
   return (currentIndex + 1) % arrayLength;
@@ -15,6 +14,8 @@ interface Props {
   left: number;
   suggestions: string[];
   handleEnter: (text: string) => void;
+  backgroundColor: string;
+  textColor: string;
 }
 
 export default function AutoComplete({
@@ -23,9 +24,10 @@ export default function AutoComplete({
   left,
   suggestions,
   handleEnter,
+  backgroundColor,
+  textColor,
 }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
-  const { theme } = useTheme();
 
   useEffect(() => {
     if (!isVisible) return;
@@ -59,9 +61,9 @@ export default function AutoComplete({
           top: top,
           left: left,
           padding: "0.5rem",
-          backgroundColor: theme.backgroundColor,
-          color: theme.defaultTextColor,
-          border: `1px solid ${theme.defaultTextColor}`,
+          backgroundColor: backgroundColor,
+          color: textColor,
+          border: `1px solid ${textColor}`,
           borderRadius: "4px",
           fontSize: 12,
           fontFamily: "sans-serif",
@@ -75,7 +77,7 @@ export default function AutoComplete({
               padding: "0.1rem 0.3rem",
               borderRadius: "4px",
               ...(activeIndex === i
-                ? { border: "1px solid " + theme.defaultTextColor }
+                ? { border: "1px solid " + textColor }
                 : {}),
             }}
             onMouseEnter={() => setActiveIndex(i)}

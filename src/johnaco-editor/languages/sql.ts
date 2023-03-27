@@ -1,4 +1,5 @@
-import { TokenMap } from "../tokenize";
+import { TokenMap } from "..";
+
 
 export const displayName = "SQL";
 

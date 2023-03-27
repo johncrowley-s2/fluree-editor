@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { debounce } from "../debounce";
-import { removeQuotes } from "../removeQuotes";
+import { debounce } from "../utils/debounce";
+import { removeQuotes } from "../utils/removeQuotes";
 
 export default function useHoverCard(hoverCards: Record<string, string>) {
   const [hoverCardPosition, setHoverCardPosition] = useState({ x: 0, y: 0 });
@@ -44,8 +44,6 @@ export default function useHoverCard(hoverCards: Record<string, string>) {
     return () =>
       document.removeEventListener("mousemove", handleMouseMoveDebounced);
   }, []);
-
-
 
   return {
     isVisible:

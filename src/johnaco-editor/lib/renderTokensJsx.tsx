@@ -1,7 +1,6 @@
 import { CSSProperties, ReactNode } from "react";
-import { removeQuotes } from "./removeQuotes";
-import { Theme } from "./themes/types";
-import { Token, TokenMap } from "./tokenize";
+import { Theme, Token, TokenMap } from "..";
+import { removeQuotes } from "./utils/removeQuotes";
 
 interface Props {
   id?: string;

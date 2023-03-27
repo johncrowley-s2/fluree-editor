@@ -1,16 +1,4 @@
-import { ThemeTokenClass } from "./themes/types";
-
-export type Token = {
-  type: string;
-  value: string;
-  line: number;
-  position: number;
-  column: number;
-};
-
-export type TokenDef = { pattern: RegExp; tokenClass?: ThemeTokenClass };
-
-export type TokenMap = { [key: string]: TokenDef };
+import { Token, TokenMap } from "..";
 
 export default function tokenize(input: string, tokenMap: TokenMap): Token[] {
   const tokens: Token[] = [];

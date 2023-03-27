@@ -1,6 +1,7 @@
+import { Token, TokenMap } from "..";
 import { testSuggestions } from "../../testSuggestions";
-import fuzzySearch from "../fuzzySearch";
-import { Token, TokenMap } from "../tokenize";
+import fuzzySearch from "../lib/utils/fuzzySearch";
+import { removeQuotes } from "../lib/utils/removeQuotes";
 
 export const displayName = "JSON-LD";
 
@@ -45,7 +46,8 @@ export function getSuggestions(
 ) {
   const currentToken = tokens[currentTokenIndex];
   if (!currentToken) return [];
-  const value = currentToken.value;
+  const value = removeQuotes(currentToken.value);
+  console.log(value);
   if (/\W+/.test(value)) return [];
   const matches = fuzzySearch(value, testSuggestions).slice(0, 5);
   if (matches.some((m) => m === value)) return [];

@@ -1,6 +1,5 @@
-import { removeQuotes } from "./removeQuotes";
-import { Theme } from "./themes/types";
-import { Token, TokenMap } from "./tokenize";
+import { Theme, Token, TokenMap } from "..";
+import { removeQuotes } from "./utils/removeQuotes";
 
 export function renderTokensHtml(
   tokens: Token[],
@@ -9,9 +8,6 @@ export function renderTokensHtml(
   hoverCards?: Record<string, string>
 ): string {
   // Render the tokenized input into an html string.
-  // Could also rewrite this to render JSX instead of HTML;
-  // Not sure if that would be less performant?
-
   return tokens
     .map((t, i) => {
       const tokenClass = tokenMap[t.type]?.tokenClass;

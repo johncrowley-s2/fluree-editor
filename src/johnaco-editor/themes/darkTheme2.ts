@@ -1,4 +1,4 @@
-import { Theme } from "./types";
+import { Theme } from "..";
 
 export const darkTheme2: Theme = {
   defaultTextColor: "#F8F8F2",

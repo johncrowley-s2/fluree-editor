@@ -1,4 +1,4 @@
-import { Theme } from "./types";
+import { Theme } from "..";
 
 export const flureeLightTheme: Theme = {
   defaultTextColor: "#333333",

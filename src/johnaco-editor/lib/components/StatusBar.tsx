@@ -1,9 +1,7 @@
 import { useMemo, useState } from "react";
-import findCurrentTokenIndex from "../lib/findCurrentTokenIndex";
-import useTextAreaSelectionStart from "../lib/hooks/useTextAreaSelectionStart";
-import { LanguageDefinition } from "../lib/languages/types";
-import { Theme } from "../lib/themes/types";
-import { Token } from "../lib/tokenize";
+import { LanguageDefinition, Theme, Token } from "../..";
+import useTextAreaSelectionStart from "../hooks/useTextAreaSelectionStart";
+import findCurrentTokenIndex from "../utils/findCurrentTokenIndex";
 import Checkmark from "./Checkmark";
 import Chevron from "./Chevron";
 import XMark from "./XMark";
@@ -12,10 +10,17 @@ interface Props {
   theme: Theme;
   errors: string[];
   tokens: Token[];
-  language: LanguageDefinition;
+  fontSize: number;
+  languageName: string;
 }
 
-export default function StatusBar({ theme, errors, tokens, language }: Props) {
+export default function StatusBar({
+  theme,
+  errors,
+  tokens,
+  fontSize,
+  languageName,
+}: Props) {
   const [showErrors, setShowErrors] = useState(false);
 
   const selectionStart = useTextAreaSelectionStart("textarea");
@@ -36,11 +41,12 @@ export default function StatusBar({ theme, errors, tokens, language }: Props) {
           width: "100%",
           left: 0,
           bottom: 0,
-          height: "1.7rem",
+          height: fontSize * 2.5,
           backgroundColor: theme.backgroundColor,
           fontFamily: "sans-serif",
-          fontSize: "0.7rem",
+          fontSize: fontSize,
           userSelect: "none",
+          borderRadius: 12,
         }}
       >
         <div
@@ -50,7 +56,7 @@ export default function StatusBar({ theme, errors, tokens, language }: Props) {
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
-            padding: "0 1rem",
+            padding: "0 " + fontSize + "px",
           }}
         >
           <div
@@ -62,33 +68,53 @@ export default function StatusBar({ theme, errors, tokens, language }: Props) {
             onClick={() => setShowErrors(!showErrors)}
             {...(errors.length > 0 ? { title: "See Errors" } : {})}
           >
-            {errors.length > 0 ? (
-              <XMark size={14} color={theme.tokenColors.Invalid} />
-            ) : (
-              <Checkmark size={14} color={theme.defaultTextColor} />
-            )}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                paddingRight: fontSize / 2,
+              }}
+            >
+              {errors.length > 0 ? (
+                <XMark size={14} color={theme.tokenColors.Invalid} />
+              ) : (
+                <Checkmark size={14} color={theme.defaultTextColor} />
+              )}
+            </div>
             {errors.length} Errors
-            {errors.length > 0 ? (
-              <Chevron size={14} direction={showErrors ? "down" : "up"} />
-            ) : null}
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                paddingLeft: fontSize / 2,
+              }}
+            >
+              {errors.length > 0 ? (
+                <Chevron size={14} direction={showErrors ? "down" : "up"} />
+              ) : null}
+            </div>
           </div>
           <div>
             Position {selectionStart}&nbsp;&nbsp; Ln {currentLine}, Col{" "}
             {currentColumn}
-            &nbsp;&nbsp;&nbsp;&nbsp;{language.displayName || ""}
+            &nbsp;&nbsp;&nbsp;&nbsp;{languageName}
           </div>
         </div>
       </div>
       {showErrors && errors.length > 0 ? (
         <div
           style={{
-            position: "sticky",
+            position: "absolute",
+            boxSizing: "border-box",
             backgroundColor: theme.backgroundColor,
-            left: 16,
-            bottom: 24,
+            left: 0,
+            bottom: fontSize * 2.5,
+            width: "100%",
             border: "1px solid" + theme.defaultTextColor,
-            borderRadius: 4,
-            padding: "1rem",
+            borderBottom: "none",
+            borderRadius: "4px 4px 0 0",
+            padding: fontSize,
+            fontSize: fontSize * 1.2,
           }}
         >
           <ul style={{ listStyle: "none" }}>

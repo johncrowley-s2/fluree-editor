@@ -1,4 +1,4 @@
-import { Theme } from "./types";
+import { Theme } from "..";
 
 export const lightTheme2: Theme = {
   defaultTextColor: "#2C3E50",

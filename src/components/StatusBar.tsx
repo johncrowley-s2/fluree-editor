@@ -32,12 +32,12 @@ export default function StatusBar({ theme, errors, tokens, language }: Props) {
     <>
       <div
         style={{
-          position: "sticky",
+          position: "absolute",
+          width: "100%",
           left: 0,
-          bottom: -1,
+          bottom: 0,
           height: "1.7rem",
           backgroundColor: theme.backgroundColor,
-          padding: "0 0.5rem",
           fontFamily: "sans-serif",
           fontSize: "0.7rem",
           userSelect: "none",

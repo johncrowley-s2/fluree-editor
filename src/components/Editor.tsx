@@ -1,15 +1,13 @@
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef } from "react";
 import findCurrentTokenIndex from "../lib/findCurrentTokenIndex";
 import getCaretCoordinates from "../lib/getCaretCoordinates";
 import useTheme from "../lib/hooks/useTheme";
 import { LanguageDefinition } from "../lib/languages/types";
 import { renderTokensJsx as renderTokens } from "../lib/renderTokensJsx";
-import tokenize, { Token } from "../lib/tokenize";
+import tokenize from "../lib/tokenize";
 import AutoComplete from "./AutoComplete";
-import Checkmark from "./Checkmark";
 import HoverCard from "./HoverCard";
 import StatusBar from "./StatusBar";
-import XMark from "./XMark";
 
 interface Props {
   value: string;
@@ -91,107 +89,122 @@ export default function Editor({
       />
       <div
         id="editorContainer"
-        className="no-scrollbar"
         style={{
           height: "100%",
           width: "100%",
-          overflow: "scroll",
           backgroundColor: theme.backgroundColor,
           color: theme.defaultTextColor,
           lineHeight: "1.2rem",
           border: "1px solid rgba(0,0,0,0)",
           borderRadius: "1rem",
           boxShadow: "0 0 6px rgba(0, 0, 0, 0.17)",
+          padding: "1rem",
+          paddingBottom: "1.7rem",
+          boxSizing: "border-box",
           position: "relative",
+          overflow: "visible",
         }}
       >
         <div
+          className="no-scrollbar"
           style={{
-            ...styles.container,
-            fontFamily: '"Source Code Pro", "Fira Mono", monospace',
-            fontSize: 14,
+            width: "100%",
+            height: "100%",
+            position: "relative",
+            overflow: "scroll",
           }}
         >
-          {showLineNumbers ? (
-            <div
-              style={{
-                position: "absolute",
-                fontFamily: "inherit",
-                fontSize: 12,
-                height: "max-content",
-                width: "1.4rem",
-                color: theme.lineNumberColor,
-                userSelect: "none",
-                paddingRight: "0.3rem",
-                paddingLeft: "0.3rem",
-                textAlign: "right",
-                padding: "0.7rem 0.3rem",
-              }}
-            >
-              {[...Array(numLines)].map((_, i) => (
-                <div
-                  key={i}
-                  style={{
-                    fontFamily: "inherit",
-                    ...(currentToken?.line === i + 1
-                      ? { color: theme.defaultTextColor }
-                      : {}),
-                  }}
-                >
-                  {i + 1}
-                </div>
-              ))}
-            </div>
-          ) : null}
-          <pre
+          <div
             style={{
-              ...styles.editor,
-              ...styles.highlight,
-              marginLeft: showLineNumbers ? "2rem" : 0,
-              paddingLeft: "0.6rem",
+              ...styles.container,
+              fontFamily: '"Source Code Pro", "Fira Mono", monospace',
+              fontSize: 14,
             }}
           >
-            {highlight
-              ? renderTokens(tokens, language.tokenMap, theme, hoverCards)
-              : value}
-          </pre>
-          {!readonly && (
-            <textarea
-              id="textarea"
-              ref={editorRef}
-              rows={numLines}
-              cols={100}
-              wrap="off"
+            {showLineNumbers ? (
+              <div
+                style={{
+                  position: "absolute",
+                  fontFamily: "inherit",
+                  fontSize: 12,
+                  height: "max-content",
+                  width: "1.4rem",
+                  color: theme.lineNumberColor,
+                  userSelect: "none",
+                  paddingRight: "0.3rem",
+                  paddingLeft: "0.3rem",
+                  textAlign: "right",
+                  padding: "0.7rem 0.3rem",
+                }}
+              >
+                {[...Array(numLines)].map((_, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      fontFamily: "inherit",
+                      ...(currentToken?.line === i + 1
+                        ? { color: theme.defaultTextColor }
+                        : {}),
+                    }}
+                  >
+                    {i + 1}
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            <pre
               style={{
                 ...styles.editor,
-                ...styles.textarea,
+                ...styles.highlight,
                 marginLeft: showLineNumbers ? "2rem" : 0,
                 paddingLeft: "0.6rem",
               }}
-              value={value}
-              onChange={(e) => onValueChange(e.target.value)}
-              spellCheck="false"
-              onKeyDown={(e) => {
-                if (e.key == "Tab" && e.target instanceof HTMLTextAreaElement) {
-                  e.preventDefault();
-                  const start = e.target.selectionStart;
-                  const end = e.target.selectionEnd;
-                  e.target.value =
-                    e.target.value.substring(0, start) +
-                    "\t" +
-                    e.target.value.substring(end);
-                  e.target.selectionStart = e.target.selectionEnd = start + 1;
-                }
-              }}
+            >
+              {highlight
+                ? renderTokens(tokens, language.tokenMap, theme, hoverCards)
+                : value}
+            </pre>
+            {!readonly && (
+              <textarea
+                id="textarea"
+                ref={editorRef}
+                rows={numLines}
+                cols={100}
+                wrap="off"
+                style={{
+                  ...styles.editor,
+                  ...styles.textarea,
+                  marginLeft: showLineNumbers ? "2rem" : 0,
+                  paddingLeft: "0.6rem",
+                }}
+                value={value}
+                onChange={(e) => onValueChange(e.target.value)}
+                spellCheck="false"
+                onKeyDown={(e) => {
+                  if (
+                    e.key == "Tab" &&
+                    e.target instanceof HTMLTextAreaElement
+                  ) {
+                    e.preventDefault();
+                    const start = e.target.selectionStart;
+                    const end = e.target.selectionEnd;
+                    e.target.value =
+                      e.target.value.substring(0, start) +
+                      "\t" +
+                      e.target.value.substring(end);
+                    e.target.selectionStart = e.target.selectionEnd = start + 1;
+                  }
+                }}
+              />
+            )}
+            <AutoComplete
+              isVisible={suggestions.length > 0}
+              top={top}
+              left={left}
+              suggestions={suggestions}
+              handleEnter={handleEnter}
             />
-          )}
-          <AutoComplete
-            isVisible={suggestions.length > 0}
-            top={top}
-            left={left}
-            suggestions={suggestions}
-            handleEnter={handleEnter}
-          />
+          </div>
         </div>
         {showStatusBar ? (
           <StatusBar
@@ -213,25 +226,21 @@ const styles = {
     textAlign: "left",
     boxSizing: "border-box",
     padding: 0,
-    overflow: "hidden",
-    minHeight: "3rem",
+    height: "100%",
   },
   textarea: {
     position: "absolute",
     top: 0,
     left: 0,
-    height: "100%",
-    width: "100%",
+    width: "500%",
     resize: "none",
     color: "inherit",
-    overflow: "hidden",
     MozOsxFontSmoothing: "grayscale",
     WebkitFontSmoothing: "antialiased",
     WebkitTextFillColor: "transparent",
   },
   highlight: {
     position: "relative",
-    // pointerEvents: "none",
   },
   editor: {
     margin: 0,

@@ -31,6 +31,8 @@ interface Props {
   language?: string;
   theme?: string;
   fontSize?: number;
+  borderRadius?: string;
+  shadow?: boolean;
 }
 
 export default function Editor({
@@ -43,6 +45,8 @@ export default function Editor({
   language = "json-ld",
   theme: themeKey = "light",
   fontSize = 14,
+  borderRadius = "8px",
+  shadow = true,
 }: Props) {
   const lang: LanguageDefinition = languageMap[language] || jsonLd;
   const { displayName, tokenMap, getSuggestions, getHovercards, getErrors } =
@@ -124,8 +128,8 @@ export default function Editor({
           color: theme.defaultTextColor,
           lineHeight: fontSize * 1.5 + "px",
           border: "1px solid rgba(0,0,0,0)",
-          borderRadius: 8,
-          boxShadow: "0 0 6px rgba(0, 0, 0, 0.1)",
+          borderRadius: borderRadius,
+          boxShadow: shadow ? "0 0 6px rgba(0, 0, 0, 0.1)" : "none",
           padding: fontSize,
           paddingBottom: showStatusBar ? fontSize * 1.5 : fontSize,
           boxSizing: "border-box",
@@ -227,8 +231,11 @@ export default function Editor({
               left={left}
               suggestions={suggestions}
               handleEnter={handleEnter}
-              backgroundColor={theme.backgroundColor}
+              backgroundColor={theme.overlayBackgroundColor}
+              activeBackgroundColor={theme.activeItemBackgroundColor}
               textColor={theme.defaultTextColor}
+              activeTextColor={theme.activeItemTextColor}
+              fontSize={fontSize}
             />
           </div>
         </div>
@@ -238,6 +245,10 @@ export default function Editor({
             errors={errors}
             tokens={tokens}
             languageName={displayName}
+            backgroundColor={theme.backgroundColor}
+            overlayBackgroundColor={theme.overlayBackgroundColor}
+            textColor={theme.defaultTextColor}
+            errorColor={theme.tokenColors.Invalid}
             fontSize={fontSize * 0.8}
           />
         ) : null}
@@ -245,7 +256,7 @@ export default function Editor({
       {getHovercards ? (
         <HoverCard
           hoverCards={hoverCards}
-          backgroundColor={theme.backgroundColor}
+          backgroundColor={theme.overlayBackgroundColor}
           textColor={theme.defaultTextColor}
           fontSize={fontSize}
         />

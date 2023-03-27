@@ -10,16 +10,23 @@ interface Props {
   theme: Theme;
   errors: string[];
   tokens: Token[];
+  backgroundColor: string;
+  overlayBackgroundColor: string;
+  textColor: string;
+  errorColor: string;
   fontSize: number;
   languageName: string;
 }
 
 export default function StatusBar({
-  theme,
   errors,
   tokens,
   fontSize,
   languageName,
+  backgroundColor,
+  overlayBackgroundColor,
+  textColor,
+  errorColor,
 }: Props) {
   const [showErrors, setShowErrors] = useState(false);
 
@@ -42,7 +49,7 @@ export default function StatusBar({
           left: 0,
           bottom: 0,
           height: fontSize * 2.5,
-          backgroundColor: theme.backgroundColor,
+          backgroundColor: backgroundColor,
           fontFamily: "sans-serif",
           fontSize: fontSize,
           userSelect: "none",
@@ -52,7 +59,7 @@ export default function StatusBar({
         <div
           style={{
             height: "100%",
-            borderTop: "1px solid " + theme.defaultTextColor,
+            borderTop: "1px solid " + textColor,
             display: "flex",
             justifyContent: "space-between",
             alignItems: "center",
@@ -76,9 +83,9 @@ export default function StatusBar({
               }}
             >
               {errors.length > 0 ? (
-                <XMark size={14} color={theme.tokenColors.Invalid} />
+                <XMark size={14} color={errorColor} />
               ) : (
-                <Checkmark size={14} color={theme.defaultTextColor} />
+                <Checkmark size={14} color={textColor} />
               )}
             </div>
             {errors.length} Errors
@@ -90,7 +97,11 @@ export default function StatusBar({
               }}
             >
               {errors.length > 0 ? (
-                <Chevron size={14} direction={showErrors ? "down" : "up"} />
+                <Chevron
+                  size={14}
+                  direction={showErrors ? "down" : "up"}
+                  color={textColor}
+                />
               ) : null}
             </div>
           </div>
@@ -106,12 +117,10 @@ export default function StatusBar({
           style={{
             position: "absolute",
             boxSizing: "border-box",
-            backgroundColor: theme.backgroundColor,
+            backgroundColor: overlayBackgroundColor,
             left: 0,
             bottom: fontSize * 2.5,
             width: "100%",
-            border: "1px solid" + theme.defaultTextColor,
-            borderBottom: "none",
             borderRadius: "4px 4px 0 0",
             padding: fontSize,
             fontSize: fontSize * 1.2,

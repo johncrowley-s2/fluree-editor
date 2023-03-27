@@ -16,6 +16,9 @@ type TokenColors = {
 export interface Theme {
   defaultTextColor: string;
   backgroundColor: string;
+  overlayBackgroundColor: string;
+  activeItemTextColor: string;
+  activeItemBackgroundColor: string;
   caretColor: string;
   lineNumberColor: string;
   highlightColor: string;

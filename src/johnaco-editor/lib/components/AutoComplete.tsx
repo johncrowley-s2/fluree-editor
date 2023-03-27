@@ -15,7 +15,10 @@ interface Props {
   suggestions: string[];
   handleEnter: (text: string) => void;
   backgroundColor: string;
+  activeBackgroundColor: string;
   textColor: string;
+  activeTextColor: string;
+  fontSize: number;
 }
 
 export default function AutoComplete({
@@ -25,7 +28,10 @@ export default function AutoComplete({
   suggestions,
   handleEnter,
   backgroundColor,
+  activeBackgroundColor,
   textColor,
+  activeTextColor,
+  fontSize,
 }: Props) {
   const [activeIndex, setActiveIndex] = useState(0);
 
@@ -60,12 +66,11 @@ export default function AutoComplete({
           position: "absolute",
           top: top,
           left: left,
-          padding: "0.5rem",
+          padding: 0,
           backgroundColor: backgroundColor,
           color: textColor,
-          border: `1px solid ${textColor}`,
           borderRadius: "4px",
-          fontSize: 12,
+          fontSize: fontSize,
           fontFamily: "sans-serif",
         }}
       >
@@ -74,10 +79,27 @@ export default function AutoComplete({
             key={s}
             style={{
               userSelect: "none",
-              padding: "0.1rem 0.3rem",
-              borderRadius: "4px",
+              padding: `${fontSize / 2}px ${fontSize}px`,
               ...(activeIndex === i
-                ? { border: "1px solid " + textColor }
+                ? {
+                    backgroundColor: activeBackgroundColor,
+                    color: activeTextColor,
+                  }
+                : {}),
+              ...(i === 0
+                ? {
+                    borderRadius: "4px 4px 0 0",
+                  }
+                : {}),
+              ...(i === suggestions.length - 1
+                ? {
+                    borderRadius: "0 0 4px 4px",
+                  }
+                : {}),
+              ...(suggestions.length === 1
+                ? {
+                    borderRadius: "4px",
+                  }
                 : {}),
             }}
             onMouseEnter={() => setActiveIndex(i)}

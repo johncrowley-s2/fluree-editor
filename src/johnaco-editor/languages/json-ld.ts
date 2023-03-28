@@ -23,7 +23,7 @@ export const tokenMap: TokenMap = {
     pattern: /^"(?:\\.|[^\n\r"\\])*$/,
     tokenClass: "Invalid",
   },
-  Invalid: { pattern: /.*/, tokenClass: "Invalid" },
+  Invalid: { pattern: /^./, tokenClass: "Invalid" },
   Newline: { pattern: /^(\r\n|\r|\n)/ },
 };
 

@@ -31,9 +31,7 @@ export default function tokenize(input: string, tokenMap: TokenMap): Token[] {
 
   while (position < input.length) {
     let matched = false;
-    for (const tokenType of Object.keys(tokenMap).sort((a, b) =>
-      a === "Newline" ? -1 : 1
-    ) as string[]) {
+    for (const tokenType of Object.keys(tokenMap)) {
       const tokenDef = tokenMap[tokenType];
       const matchResult = match(tokenDef.pattern);
       if (matchResult) {

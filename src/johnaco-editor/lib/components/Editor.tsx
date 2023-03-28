@@ -36,41 +36,6 @@ interface Props {
   shadow?: boolean;
 }
 
-const Textarea = React.memo<{
-  value: string;
-  onValueChange: (value: string) => void;
-}>(({ value, onValueChange }) => {
-  const editorRef = useRef<HTMLTextAreaElement>(null);
-
-  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (e.key === "Tab" && e.target instanceof HTMLTextAreaElement) {
-      e.preventDefault(); // prevent the default behavior of moving focus to the next element
-      const textarea = e.target;
-      const start = textarea.selectionStart || 0;
-      const end = textarea.selectionEnd || 0;
-      const newValue = value.substring(0, start) + "\t" + value.substring(end);
-      const newSelectionStart = start + 1;
-      onValueChange(newValue);
-      textarea.setSelectionRange(newSelectionStart, newSelectionStart);
-    }
-  }
-
-  useLayoutEffect(() => {
-    if (editorRef.current) {
-      editorRef.current.focus();
-    }
-  }, [value]);
-
-  return (
-    <textarea
-      ref={editorRef}
-      value={value}
-      onChange={(e) => onValueChange(e.target.value)}
-      onKeyDown={handleKeyDown}
-    />
-  );
-});
-
 export default function Editor({
   value,
   onValueChange,
@@ -148,12 +113,11 @@ export default function Editor({
     setSelectionStart(editorRef.current.selectionStart);
   };
 
-  useEffect(() => updateSelectionStart, [value]);
-
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (editorRef.current) {
       editorRef.current.focus();
     }
+    updateSelectionStart();
   }, [value]);
 
   // TODO: This logic probably needs to be more language-agnostic or else

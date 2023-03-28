@@ -72,22 +72,21 @@ export default function Editor({
     return findCurrentTokenIndex(tokens, caretPosition);
   }, [tokens]);
 
-  const suggestions = useMemo(() => {
-    if (!getSuggestions) return [];
-    const caretPosition = editorRef.current?.selectionStart || 0;
-    return getSuggestions(tokens, currentTokenIndex, caretPosition);
-  }, [tokens, currentTokenIndex]);
+  const [suggestions, hoverCards, errors] = useMemo(() => {
+    let suggestions: string[] = [];
+    let hoverCards: Record<string, string> = {};
+    let errors: string[] = [];
 
-  const hoverCards = useMemo(() => {
-    if (!getHovercards) return {};
     const caretPosition = editorRef.current?.selectionStart || 0;
-    return getHovercards(tokens, currentTokenIndex, caretPosition);
-  }, [tokens, currentTokenIndex]);
 
-  const errors = useMemo(() => {
-    if (!getErrors) return [];
-    const caretPosition = editorRef.current?.selectionStart || 0;
-    return getErrors(value, tokens, currentTokenIndex, caretPosition);
+    if (getSuggestions)
+      suggestions = getSuggestions(tokens, currentTokenIndex, caretPosition);
+    if (getHovercards)
+      hoverCards = getHovercards(tokens, currentTokenIndex, caretPosition);
+    if (getErrors)
+      errors = getErrors(value, tokens, currentTokenIndex, caretPosition);
+
+    return [suggestions, hoverCards, errors];
   }, [value, tokens, currentTokenIndex]);
 
   // TODO: This logic probably needs to be more language-agnostic or else

@@ -45,7 +45,7 @@ export function getSuggestions(
   currentTokenIndex: number,
   position: number
 ) {
-  if (value === "") return snippets;
+  if (/^{\s*"(?!\S)/.test(value)) return snippets;
   const currentToken = tokens[currentTokenIndex];
   if (!currentToken) return [];
   const tokenValue = removeQuotes(currentToken.value);

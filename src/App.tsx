@@ -16,12 +16,6 @@ function App() {
     else setValue(sql);
   }, [language]);
 
-  // function prettify() {
-  //   if (!language.prettify) return;
-  //   console.log("ORIG: ", value, "PRETTY: ", language.prettify(value));
-  //   setValue(language.prettify(value));
-  // }
-
   function handleChangeLanguage(e: ChangeEvent<HTMLSelectElement>) {
     if (e.target.value === "sql") setLanguage("sql");
     else setLanguage("json-ld");

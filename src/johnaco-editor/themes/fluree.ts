@@ -7,7 +7,7 @@ export const flureeLightTheme: Theme = {
   activeItemBackgroundColor: "#0070AF",
   activeItemTextColor: "#FFFFFF",
   caretColor: "#5A5A5A",
-  lineNumberColor: "#888888",
+  lineNumberColor: "#666666",
   highlightColor: "#FFF8DC",
   tokenColors: {
     Keyword: "#0070AF",

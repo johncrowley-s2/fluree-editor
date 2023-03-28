@@ -1,4 +1,5 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import React from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { LanguageDefinition, Suggestion, Theme } from "../..";
 import * as jsonLd from "../../languages/json-ld";
 import * as sql from "../../languages/sql";
@@ -34,6 +35,41 @@ interface Props {
   borderRadius?: string;
   shadow?: boolean;
 }
+
+const Textarea = React.memo<{
+  value: string;
+  onValueChange: (value: string) => void;
+}>(({ value, onValueChange }) => {
+  const editorRef = useRef<HTMLTextAreaElement>(null);
+
+  function handleKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Tab" && e.target instanceof HTMLTextAreaElement) {
+      e.preventDefault(); // prevent the default behavior of moving focus to the next element
+      const textarea = e.target;
+      const start = textarea.selectionStart || 0;
+      const end = textarea.selectionEnd || 0;
+      const newValue = value.substring(0, start) + "\t" + value.substring(end);
+      const newSelectionStart = start + 1;
+      onValueChange(newValue);
+      textarea.setSelectionRange(newSelectionStart, newSelectionStart);
+    }
+  }
+
+  useLayoutEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+  }, [value]);
+
+  return (
+    <textarea
+      ref={editorRef}
+      value={value}
+      onChange={(e) => onValueChange(e.target.value)}
+      onKeyDown={handleKeyDown}
+    />
+  );
+});
 
 export default function Editor({
   value,
@@ -114,11 +150,17 @@ export default function Editor({
 
   useEffect(() => updateSelectionStart, [value]);
 
+  useLayoutEffect(() => {
+    if (editorRef.current) {
+      editorRef.current.focus();
+    }
+  }, [value]);
+
   // TODO: This logic probably needs to be more language-agnostic or else
   // moved to be with the language definition.
   function handleEnter(text: string) {
     if (!editorRef.current) return;
-    if (value === "") {
+    if (/^{\s*"(?!\S)/.test(value)) {
       onValueChange(text);
       return;
     }
@@ -177,6 +219,7 @@ export default function Editor({
               ...styles.container,
               fontFamily: '"Source Code Pro", "Fira Mono", monospace',
               fontSize: fontSize,
+              tabSize: 2,
             }}
           >
             {showLineNumbers ? (
@@ -199,7 +242,7 @@ export default function Editor({
                     style={{
                       fontFamily: "inherit",
                       ...(currentLine === i + 1
-                        ? { color: theme.defaultTextColor }
+                        ? { color: theme.defaultTextColor, fontWeight: "bold" }
                         : {}),
                     }}
                   >
@@ -239,17 +282,28 @@ export default function Editor({
                     e.key == "Tab" &&
                     e.target instanceof HTMLTextAreaElement
                   ) {
+                    if (!editorRef.current) return;
                     e.preventDefault();
-                    const start = e.target.selectionStart;
-                    const end = e.target.selectionEnd;
-                    e.target.value =
-                      e.target.value.substring(0, start) +
+                    const { selectionStart, selectionEnd } = e.target;
+
+                    const newText =
+                      value.substring(0, selectionStart) +
                       "\t" +
-                      e.target.value.substring(end);
-                    e.target.selectionStart = e.target.selectionEnd = start + 1;
+                      value.substring(selectionEnd, value.length);
+
+                    editorRef.current.focus();
+                    editorRef.current.value = newText;
+
+                    editorRef.current.setSelectionRange(
+                      selectionStart + 1,
+                      selectionStart + 1
+                    );
+
+                    onValueChange(newText);
                   }
                 }}
                 onKeyUp={updateSelectionStart}
+                onMouseUp={updateSelectionStart}
               />
             )}
             <AutoComplete

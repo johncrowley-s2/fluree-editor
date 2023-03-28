@@ -1,5 +1,4 @@
-import React from "react";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { LanguageDefinition, Suggestion, Theme } from "../..";
 import * as jsonLd from "../../languages/json-ld";
 import * as sql from "../../languages/sql";

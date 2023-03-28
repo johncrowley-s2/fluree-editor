@@ -40,21 +40,23 @@ export function prettify(jsonString: string): string {
 }
 
 export function getSuggestions(
+  value: string,
   tokens: Token[],
   currentTokenIndex: number,
   position: number
 ) {
+  if (value === "") return snippets;
   const currentToken = tokens[currentTokenIndex];
   if (!currentToken) return [];
-  const value = removeQuotes(currentToken.value);
-  console.log(value);
-  if (/\W+/.test(value)) return [];
-  const matches = fuzzySearch(value, testSuggestions).slice(0, 5);
-  if (matches.some((m) => m === value)) return [];
-  return matches;
+  const tokenValue = removeQuotes(currentToken.value);
+  if (/\W+/.test(tokenValue)) return [];
+  const matches = fuzzySearch(tokenValue, testSuggestions).slice(0, 5);
+  if (matches.some((m) => m === tokenValue)) return [];
+  return matches.map((m) => ({ label: m, value: m }));
 }
 
 export function getHovercards(
+  value: string,
   tokens: Token[],
   currentTokenIndex: number,
   position: number
@@ -103,3 +105,24 @@ export function getErrors(
   }
   return results;
 }
+
+export const snippets = [
+  {
+    label: "query select",
+    value: '{\n  "select": ["*"],\n  "from": "_collection"\n}',
+  },
+  {
+    label: "query selectOne",
+    value: '{\n  "selectOne": ["*"],\n  "from": "_collection"\n}',
+  },
+  {
+    label: "query analytical",
+    value:
+      '{\n  "where": [\n      ["?p", "_predicate/name", "?name"]\n    ],\n  "select": ["?name"]\n}',
+  },
+  {
+    label: "query block",
+    value: '{\n  "block": 2,\n  "prettyPrint": false\n}',
+  },
+  { label: "query history", value: '{\n  "history": 123456789\n}' },
+];

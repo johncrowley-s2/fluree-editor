@@ -1,7 +1,5 @@
-import { useMemo, useState } from "react";
-import { LanguageDefinition, Theme, Token } from "../..";
-import useTextAreaSelectionStart from "../hooks/useTextAreaSelectionStart";
-import findCurrentTokenIndex from "../utils/findCurrentTokenIndex";
+import { useState } from "react";
+import { Theme } from "../..";
 import Checkmark from "./Checkmark";
 import Chevron from "./Chevron";
 import XMark from "./XMark";
@@ -9,36 +7,28 @@ import XMark from "./XMark";
 interface Props {
   theme: Theme;
   errors: string[];
-  tokens: Token[];
   backgroundColor: string;
   overlayBackgroundColor: string;
   textColor: string;
   errorColor: string;
   fontSize: number;
   languageName: string;
+  currentLine: number;
+  currentColumn: number;
 }
 
 export default function StatusBar({
   errors,
-  tokens,
   fontSize,
   languageName,
   backgroundColor,
   overlayBackgroundColor,
   textColor,
   errorColor,
+  currentLine,
+  currentColumn,
 }: Props) {
   const [showErrors, setShowErrors] = useState(false);
-
-  const selectionStart = useTextAreaSelectionStart("textarea");
-
-  const [currentLine, currentColumn] = useMemo(() => {
-    const currentTokenIndex = findCurrentTokenIndex(tokens, selectionStart);
-    const currentToken = tokens[currentTokenIndex];
-    if (!currentToken) return [1, 1];
-    const difference = selectionStart - currentToken.position;
-    return [currentToken.line, currentToken.column + difference];
-  }, [tokens, selectionStart]);
 
   return (
     <>
@@ -106,8 +96,7 @@ export default function StatusBar({
             </div>
           </div>
           <div>
-            Position {selectionStart}&nbsp;&nbsp; Ln {currentLine}, Col{" "}
-            {currentColumn}
+            Ln {currentLine}, Col {currentColumn}
             &nbsp;&nbsp;&nbsp;&nbsp;{languageName}
           </div>
         </div>

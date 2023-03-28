@@ -25,16 +25,23 @@ export interface Theme {
   tokenColors: TokenColors;
 }
 
+export interface Suggestion {
+  label: string;
+  value: string;
+}
+
 export interface LanguageDefinition {
   displayName: string;
   tokenMap: TokenMap;
   prettify?: (value: string) => string;
   getSuggestions?: (
+    value: string,
     tokens: Token[],
     currentTokenIndex: number,
     position: number
-  ) => string[];
+  ) => Suggestion[];
   getHovercards?: (
+    value: string,
     tokens: Token[],
     currentTokenIndex: number,
     position: number
@@ -60,3 +67,4 @@ export type TokenDef = { pattern: RegExp; tokenClass?: ThemeTokenClass };
 export type TokenMap = { [key: string]: TokenDef };
 
 export { default as JohnacoEditor } from "./lib/components/Editor";
+

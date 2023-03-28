@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Suggestion } from "../..";
 
 function incrementIndex(currentIndex: number, arrayLength: number) {
   return (currentIndex + 1) % arrayLength;
@@ -12,7 +13,7 @@ interface Props {
   isVisible: boolean;
   top: number;
   left: number;
-  suggestions: string[];
+  suggestions: Suggestion[];
   handleEnter: (text: string) => void;
   backgroundColor: string;
   activeBackgroundColor: string;
@@ -47,7 +48,7 @@ export default function AutoComplete({
       } else if (e.key === "Enter") {
         e.preventDefault();
         setActiveIndex(0);
-        handleEnter(suggestions[activeIndex]);
+        handleEnter(suggestions[activeIndex].value);
       }
     }
 
@@ -76,10 +77,10 @@ export default function AutoComplete({
       >
         {suggestions.map((s, i) => (
           <div
-            key={s}
+            key={s.label}
             style={{
               userSelect: "none",
-              padding: `${fontSize / 2}px ${fontSize}px`,
+              padding: `${fontSize / 4}px ${fontSize}px`,
               ...(activeIndex === i
                 ? {
                     backgroundColor: activeBackgroundColor,
@@ -103,9 +104,9 @@ export default function AutoComplete({
                 : {}),
             }}
             onMouseEnter={() => setActiveIndex(i)}
-            onClick={() => handleEnter(suggestions[i])}
+            onClick={() => handleEnter(suggestions[i].value)}
           >
-            {s}
+            {s.label}
           </div>
         ))}
       </div>

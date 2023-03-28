@@ -1,5 +1,5 @@
-import { useMemo, useRef } from "react";
-import { LanguageDefinition, Theme } from "../..";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { LanguageDefinition, Suggestion, Theme } from "../..";
 import * as jsonLd from "../../languages/json-ld";
 import * as sql from "../../languages/sql";
 import { flureeDarkTheme, flureeLightTheme } from "../../themes/fluree";
@@ -54,10 +54,21 @@ export default function Editor({
 
   const theme = themeMap[themeKey];
 
+  const [selectionStart, setSelectionStart] = useState(0);
+
   const editorRef = useRef<HTMLTextAreaElement>(null);
 
   const tokens = useMemo(() => tokenize(value, tokenMap), [value]);
   const numLines = useMemo(() => value.split("\n").length, [value]);
+
+  const [currentLine, currentColumn] = useMemo(() => {
+    if (!editorRef.current) return [1, 1];
+    const currentTokenIndex = findCurrentTokenIndex(tokens, selectionStart);
+    const currentToken = tokens[currentTokenIndex];
+    if (!currentToken) return [1, 1];
+    const difference = selectionStart - currentToken.position;
+    return [currentToken.line, currentToken.column + difference];
+  }, [tokens, selectionStart]);
 
   const { top, left } = useMemo(() => {
     if (editorRef.current) {
@@ -73,26 +84,44 @@ export default function Editor({
   }, [tokens]);
 
   const [suggestions, hoverCards, errors] = useMemo(() => {
-    let suggestions: string[] = [];
+    let suggestions: Suggestion[] = [];
     let hoverCards: Record<string, string> = {};
     let errors: string[] = [];
-
     const caretPosition = editorRef.current?.selectionStart || 0;
-
     if (getSuggestions)
-      suggestions = getSuggestions(tokens, currentTokenIndex, caretPosition);
+      suggestions = getSuggestions(
+        value,
+        tokens,
+        currentTokenIndex,
+        caretPosition
+      );
     if (getHovercards)
-      hoverCards = getHovercards(tokens, currentTokenIndex, caretPosition);
+      hoverCards = getHovercards(
+        value,
+        tokens,
+        currentTokenIndex,
+        caretPosition
+      );
     if (getErrors)
       errors = getErrors(value, tokens, currentTokenIndex, caretPosition);
-
     return [suggestions, hoverCards, errors];
   }, [value, tokens, currentTokenIndex]);
+
+  const updateSelectionStart = () => {
+    if (!editorRef.current) return;
+    setSelectionStart(editorRef.current.selectionStart);
+  };
+
+  useEffect(() => updateSelectionStart, [value]);
 
   // TODO: This logic probably needs to be more language-agnostic or else
   // moved to be with the language definition.
   function handleEnter(text: string) {
     if (!editorRef.current) return;
+    if (value === "") {
+      onValueChange(text);
+      return;
+    }
     const { value: tokenValue } = tokens[currentTokenIndex];
     let start = editorRef.current.selectionStart - tokenValue.length;
     if (tokenValue[0] === '"') start++;
@@ -103,8 +132,6 @@ export default function Editor({
       value.slice(editorRef.current.selectionStart);
     onValueChange(newValue);
   }
-
-  const currentToken = tokens[currentTokenIndex];
 
   const additionalEditorStyles = {
     marginLeft: showLineNumbers ? fontSize * 1.2 : 0,
@@ -171,7 +198,7 @@ export default function Editor({
                     key={i}
                     style={{
                       fontFamily: "inherit",
-                      ...(currentToken?.line === i + 1
+                      ...(currentLine === i + 1
                         ? { color: theme.defaultTextColor }
                         : {}),
                     }}
@@ -222,6 +249,7 @@ export default function Editor({
                     e.target.selectionStart = e.target.selectionEnd = start + 1;
                   }
                 }}
+                onKeyUp={updateSelectionStart}
               />
             )}
             <AutoComplete
@@ -242,13 +270,14 @@ export default function Editor({
           <StatusBar
             theme={theme}
             errors={errors}
-            tokens={tokens}
             languageName={displayName}
             backgroundColor={theme.backgroundColor}
             overlayBackgroundColor={theme.overlayBackgroundColor}
             textColor={theme.defaultTextColor}
             errorColor={theme.tokenColors.Invalid}
             fontSize={fontSize * 0.8}
+            currentLine={currentLine}
+            currentColumn={currentColumn}
           />
         ) : null}
       </div>
